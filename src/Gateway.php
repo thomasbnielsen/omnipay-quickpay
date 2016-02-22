@@ -18,7 +18,7 @@ class Gateway extends AbstractGateway
 		return 'Quickpay';
 	}
 
-
+  
 	public function getDefaultParameters()
 	{
 		return array(

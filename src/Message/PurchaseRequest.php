@@ -24,7 +24,7 @@ class PurchaseRequest extends AbstractRequest
  		$data['amount'] = $this->getParameter('amount') * 100;
  		$data['currency'] = $this->getParameter('currency');
 		$data['cancelurl'] = $this->getParameter('cancelUrl');
-		$data['callbackurl'] = "tiebreak.dev/CallbankHandler";
+		$data['callbackurl'] = $this->getParameter('callbackurl');
 		// specify redirect url here, after payment
 		$data['continueurl'] = $this->getParameter('returnUrl');
 		// set language of payment window

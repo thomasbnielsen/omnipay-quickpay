@@ -102,22 +102,5 @@ class Gateway extends AbstractGateway
 		return $this->createRequest('\Omnipay\Quickpay\Message\CaptureRequest', $parameters);
 	}
 
-	/**
-	 * @param array $parameters
-	 * @return RefundRequest
-	 */
-	public function refund(array $parameters = array())
-	{
-		return $this->createRequest('\Omnipay\Quickpay\Message\RefundRequest', $parameters);
-	}
-
-	/**
-	 * @param array $parameters
-	 * @return DeleteRequest
-	 */
-	public function delete(array $parameters = array())
-	{
-		return $this->createRequest('\Omnipay\Quickpay\Message\DeleteRequest', $parameters);
-	}
 
 }

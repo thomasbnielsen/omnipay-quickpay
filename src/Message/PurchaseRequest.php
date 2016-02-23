@@ -20,7 +20,7 @@ class PurchaseRequest extends AbstractRequest
 		$data['merchant_id'] = $this->getParameter('merchant');
 		$data['agreement_id'] = $this->getParameter('agreement');
 		// quickpay requires order numbers to be at least 4 characters long
-		$data['order_id'] = "order" . $this->getParameter('transactionId');
+		$data['order_id'] = "orderID" . $this->getParameter('transactionId');
  		$data['amount'] = $this->getParameter('amount') * 100;
  		$data['currency'] = $this->getParameter('currency');
 		$data['cancelurl'] = $this->getParameter('cancelUrl');
@@ -29,8 +29,8 @@ class PurchaseRequest extends AbstractRequest
 		$data['continueurl'] = $this->getParameter('returnUrl');
 		// set language of payment window
 		$data['language'] = $this->getParameter('language');
-		// if se to 1, will autocapture
-		$data['autocapture'] = 0;
+		// if set to 1, will autocapture
+		$data['autocapture'] = 1;
 		// limit payment methods by setting this
 		//$data['payment_methods'] = "creditcard, !jcb, !visa-us, !maestro";
 
@@ -38,7 +38,7 @@ class PurchaseRequest extends AbstractRequest
 		return $this->form_fields($data);
 	}
 
-	private function form_fields($input_data)
+	public function form_fields($input_data)
 	{
 
 		$valid_input_ordered = array('version', 'merchant_id', 'agreement_id', 'order_id', 'amount', 'currency', 'cancelurl', 'continueurl', 'autocapture', 'payment_methods', 'language');

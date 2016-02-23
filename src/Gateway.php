@@ -3,10 +3,6 @@
 namespace Omnipay\Quickpay;
 
 use Omnipay\Common\AbstractGateway;
-use Omnipay\Quickpay\Message\CaptureRequest;
-use Omnipay\Quickpay\Message\AuthorizeRequest;
-use Omnipay\Quickpay\Message\CompletePurchaseRequest;
-use Omnipay\Quickpay\Message\PurchaseRequest;
 
 /**
  * Quickpay Gateway
@@ -26,11 +22,17 @@ class Gateway extends AbstractGateway
 			'agreement' => '',
 			'apikey' => '',
 			'language' => '',
-			//'callbackurl' => '',
-			'continueurl' => '',
-			'cancelurl' => '',
+			'callbackurl' => '',
 			//'payment_methods' => array("creditcard, !jcb, !visa-us, !maestro")
 		);
+	}
+
+	public function getCallbackURL(){
+		return $this->getParameter('callbackurl');
+	}
+
+	public function setCallbackURL($value){
+		return $this->setParameter('callbackurl', $value);
 	}
 
 	public function getMerchant()
@@ -78,19 +80,37 @@ class Gateway extends AbstractGateway
 		return $this->createRequest('\Omnipay\Quickpay\Message\AuthorizeRequest', $parameters);
 	}
 
-	// this will auto capture for some reason
+	/**
+	 * Start a purchase request
+	 *
+	 * @param array $parameters array of options
+	 * @return \Omnipay\Quickpay\Message\PurchaseRequest
+	 */
 	public function purchase(array $parameters = array())
 	{
 		return $this->createRequest('\Omnipay\Quickpay\Message\PurchaseRequest', $parameters);
 	}
 
 	/**
+	 * Complete a purchase
+	 *
 	 * @param array $parameters
-	 * @return CompletePurchaseRequest
+	 * @return \Omnipay\Quickpay\Message\CompletePurchaseRequest
 	 */
 	public function completePurchase(array $parameters = array())
 	{
 		return $this->createRequest('\Omnipay\Quickpay\Message\CompletePurchaseRequest', $parameters);
+	}
+
+	/**
+	 * Complete an authorization
+	 *
+	 * @param array $parameters
+	 * @return \Omnipay\Quickpay\Message\CompleteAuthorizeRequest
+	 */
+	public function completeAuthorize(array $parameters = array())
+	{
+		return $this->completePurchase($parameters);
 	}
 
 	/**
@@ -101,6 +121,5 @@ class Gateway extends AbstractGateway
 	{
 		return $this->createRequest('\Omnipay\Quickpay\Message\CaptureRequest', $parameters);
 	}
-
 
 }

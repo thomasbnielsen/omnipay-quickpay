@@ -6,7 +6,7 @@ use Omnipay\Common\Message\AbstractResponse;
 use Omnipay\Common\Message\RedirectResponseInterface;
 
 /**
- * quickpay Purchase Response
+ * Quickpay Purchase Response
  */
 class PurchaseResponse extends AbstractResponse implements RedirectResponseInterface
 {

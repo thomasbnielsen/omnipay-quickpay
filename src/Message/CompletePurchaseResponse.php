@@ -4,18 +4,12 @@ namespace Omnipay\Quickpay\Message;
 
 use Omnipay\Common\Message\AbstractResponse;
 
-/**
- * Epay Complete Purchase Response
- */
 class CompletePurchaseResponse extends AbstractResponse
 {
     public function isSuccessful()
     {
+		// should check for valid codes in headers, not just return true
         return true;
     }
 
-    public function getTransactionReference()
-    {
-        return isset($this->data['txnid']) ? $this->data['txnid'] : null;
-    }
 }

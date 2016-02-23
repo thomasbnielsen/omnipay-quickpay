@@ -11,7 +11,6 @@ class CompletePurchaseRequest extends PurchaseRequest
 {
     public function getData()
     {
-
         return $this->httpRequest->query->all();
     }
 

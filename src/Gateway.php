@@ -22,9 +22,17 @@ class Gateway extends AbstractGateway
 			'merchant' => '',
 			'agreement' => '',
 			'apikey' => '',
-			'language' => ''
-			//'payment_methods' => array("creditcard, !jcb, !visa-us, !maestro")
+			'language' => '',
+			'payment_methods' => array()
 		);
+	}
+
+	public function getPaymentMethods(){
+		return $this->getParameter('payment_methods');
+	}
+
+	public function setPaymentMethods($value = array()){
+		return $this->setParameter('payment_methods', $value);
 	}
 
 	public function getMerchant()

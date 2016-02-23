@@ -46,4 +46,12 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 	{
 		return $this->setParameter('language', $value);
 	}
+
+	public function getPaymentMethods(){
+		return $this->getParameter('payment_methods');
+	}
+
+	public function setPaymentMethods($value = array()){
+		return $this->setParameter('payment_methods', $value);
+	}
 }

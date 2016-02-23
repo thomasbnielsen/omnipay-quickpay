@@ -17,22 +17,22 @@ class PurchaseRequest extends AbstractRequest
 
 		$data = array();
 		$data['version'] = "v10";
-		$data['merchant_id'] = $this->getParameter('merchant');
-		$data['agreement_id'] = $this->getParameter('agreement');
+		$data['merchant_id'] = $this->getMerchant();
+		$data['agreement_id'] = $this->getAgreement();
 		// quickpay requires order numbers to be at least 4 characters long
-		$data['order_id'] = "orderID" . $this->getParameter('transactionId');
- 		$data['amount'] = $this->getParameter('amount') * 100;
- 		$data['currency'] = $this->getParameter('currency');
-		$data['cancelurl'] = $this->getParameter('cancelUrl');
-		$data['callbackurl'] = $this->getParameter('notifyUrl');
+		$data['order_id'] = "orderID" . $this->getTransactionId();
+ 		$data['amount'] = $this->getAmountInteger();
+ 		$data['currency'] = $this->getCurrency();
+		$data['cancelurl'] = $this->getCancelUrl();
+		$data['callbackurl'] = $this->getReturnUrl();
 		// specify redirect url here, after payment
-		$data['continueurl'] = $this->getParameter('returnUrl');
+		$data['continueurl'] = $this->getReturnUrl();
 		// set language of payment window
-		$data['language'] = $this->getParameter('language');
+		$data['language'] = $this->getLanguage();
 		// if set to 1, will autocapture
 		$data['autocapture'] = 1;
 		// limit payment methods by setting this
-		//$data['payment_methods'] = "creditcard, !jcb, !visa-us, !maestro";
+		$data['payment_methods'] = $this->getPaymentMethods();
 
 
 		return $this->form_fields($data);

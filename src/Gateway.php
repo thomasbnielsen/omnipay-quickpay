@@ -17,22 +17,14 @@ class Gateway extends AbstractGateway
   
 	public function getDefaultParameters()
 	{
+		parent::getDefaultParameters();
 		return array(
 			'merchant' => '',
 			'agreement' => '',
 			'apikey' => '',
-			'language' => '',
-			'callbackurl' => '',
+			'language' => ''
 			//'payment_methods' => array("creditcard, !jcb, !visa-us, !maestro")
 		);
-	}
-
-	public function getCallbackURL(){
-		return $this->getParameter('callbackurl');
-	}
-
-	public function setCallbackURL($value){
-		return $this->setParameter('callbackurl', $value);
 	}
 
 	public function getMerchant()

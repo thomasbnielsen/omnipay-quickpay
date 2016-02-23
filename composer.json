@@ -23,5 +23,6 @@
 	},
 	"autoload": {
 		"psr-4": { "Omnipay\\Quickpay\\" : "src/" }
-	}
+	},
+	"minimum-stability": "dev"
 }

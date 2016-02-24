@@ -7,24 +7,25 @@ use Omnipay\Common\Message\AbstractResponse;
 class CompletePurchaseResponse extends AbstractResponse
 {
 
-	protected $validStates = array(
-		// valid states are 2xx , 302 , 303
-		302, 303
-	);
+	public function __construct($request, $data)
+	{
+		$this->request = $request;
+		$this->data = $data;
+	}
 
 
     public function isSuccessful()
     {
 		$status = $this->getCode();
 		// should check for valid codes in headers, not just return true
-		//if ($status >= 200 && $status < 300 || in_array($status, $this->validStates)) {
+		//if ($status == 200) {
 		//	return true;
 		//}
 		return true;
     }
 
 	public function getCode(){
-		return isset($this->data['operations']['qp_status_code']) ? $this->data['operations']['qp_status_code'] : '';
+		return isset($this->request['operations']['qp_status_code']) ? $this->request['operations']['qp_status_code'] : '';
 	}
 
 	public function getTransactionReference()

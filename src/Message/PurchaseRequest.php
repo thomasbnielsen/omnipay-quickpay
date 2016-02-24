@@ -24,7 +24,7 @@ class PurchaseRequest extends AbstractRequest
  		$data['amount'] = $this->getAmountInteger();
  		$data['currency'] = $this->getCurrency();
 		$data['cancelurl'] = $this->getCancelUrl();
-		$data['callbackurl'] = $this->getReturnUrl();
+		$data['callbackurl'] = $this->getNotifyUrl();
 		// specify redirect url here, after payment
 		$data['continueurl'] = $this->getReturnUrl();
 		// set language of payment window
@@ -41,7 +41,7 @@ class PurchaseRequest extends AbstractRequest
 	public function form_fields($input_data)
 	{
 
-		$valid_input_ordered = array('version', 'merchant_id', 'agreement_id', 'order_id', 'amount', 'currency', 'cancelurl', 'continueurl', 'autocapture', 'payment_methods', 'language');
+		$valid_input_ordered = array('version', 'merchant_id', 'agreement_id', 'order_id', 'amount', 'currency', 'cancelurl', 'continueurl','callbackurl','autocapture', 'payment_methods', 'language');
 		// create array with our data
 		foreach($valid_input_ordered as $key)
 		{

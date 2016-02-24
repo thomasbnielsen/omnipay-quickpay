@@ -24,7 +24,8 @@ class PurchaseRequest extends AbstractRequest
  		$data['amount'] = $this->getAmountInteger();
  		$data['currency'] = $this->getCurrency();
 		$data['cancelurl'] = $this->getCancelUrl();
-		$data['callbackurl'] = $this->getNotifyUrl();
+		//$data['callbackurl'] = $this->getNotifyUrl();
+		$data['callbackurl'] = 'http://requestb.in/17rcey61';
 		// specify redirect url here, after payment
 		$data['continueurl'] = $this->getReturnUrl();
 		// set language of payment window

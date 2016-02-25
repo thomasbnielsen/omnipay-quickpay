@@ -25,9 +25,7 @@ class CaptureResponse extends AbstractResponse implements RedirectResponseInterf
 	{
 		$this->request = $request;
 		$this->data = $data;
-		echo '<pre>';
-		print_r($this->request);
-		echo '</pre>';
+
 	}
 
 	public function isSuccessful()

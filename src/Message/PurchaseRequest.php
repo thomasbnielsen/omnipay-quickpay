@@ -18,7 +18,7 @@ class PurchaseRequest extends AbstractRequest
 		$data = array();
 		$data['version'] = "v10";
 		$data['merchant_id'] = $this->getMerchant();
-		$data['agreement_id'] = $this->getAgreement();
+		$data['agreement_id'] = $this->getPaymentWindowAgreement();
 		// quickpay requires order numbers to be at least 4 characters long
 		$data['order_id'] = "orderID" . $this->getTransactionId();
  		$data['amount'] = $this->getAmountInteger();
@@ -30,9 +30,11 @@ class PurchaseRequest extends AbstractRequest
 		// set language of payment window
 		$data['language'] = $this->getLanguage();
 		// if set to 1, will autocapture
+		// TODO autocapture needs to be testet
 		$data['autocapture'] = 0;
 		// limit payment methods by setting this
 		$data['payment_methods'] = $this->getPaymentMethods();
+
 
 		return $this->form_fields($data);
 	}
@@ -52,7 +54,7 @@ class PurchaseRequest extends AbstractRequest
 		//create quickpay checksum
 		// api key is used
 		// this used to be called md5secret in the old quickpay platform
-		$data_fields['checksum'] = $this->sign($data_fields, $this->getParameter('apikey'));
+		$data_fields['checksum'] = $this->sign($data_fields, $this->getParameter('payment_window_apikey'));
 		return $data_fields;
 
 	}

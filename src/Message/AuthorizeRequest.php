@@ -12,7 +12,7 @@ class AuthorizeRequest extends PurchaseRequest
 		$data = parent::getData();
 
 		$data['autocapture'] = 0;
-
+		
 		return $this->form_fields($data);
 	}
 

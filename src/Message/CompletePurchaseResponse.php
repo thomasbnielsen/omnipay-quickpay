@@ -5,6 +5,7 @@ namespace Omnipay\Quickpay\Message;
 use Omnipay\Common\Message\AbstractResponse;
 // in this response we should get some data from the gateway, to make sure of the status of the payment,
 // here we should also get acces to getTransactionReference() which should be stored in the projects DB, as a reference point to later capture the payment
+// it seems that Quickpay works annoyingly so they only send this response data to a callbackURL
 class CompletePurchaseResponse extends AbstractResponse
 {
 /*
@@ -27,6 +28,8 @@ class CompletePurchaseResponse extends AbstractResponse
 		//if($this->data['checksum'] == $this->request['Quickpay-Checksum-Sha256']){
 		//	return true
 		//}
+
+        // should make some checks
 		return true;
     }
 
@@ -40,7 +43,9 @@ class CompletePurchaseResponse extends AbstractResponse
 
 		// store this on merchant sites db!
 		//return isset($input->id) ? $input->id : '';
-		return 'order123';
+
+        // should of course return the correct data
+		return '123123123123';
 	}
 
 }

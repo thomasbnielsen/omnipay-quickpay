@@ -21,7 +21,9 @@ class Gateway extends AbstractGateway
 		return array(
 			'merchant' => '',
 			'agreement' => '',
+			'payment_window_agreement' => '',
 			'apikey' => '',
+			'payment_window_apikey' => '',
 			'language' => '',
 			'payment_methods' => array()
 		);
@@ -44,6 +46,16 @@ class Gateway extends AbstractGateway
 	{
 		return $this->setParameter('merchant', $value);
 	}
+	
+	public function getPaymentWindowAgreement()
+	{
+		return $this->getParameter('payment_window_agreement');
+	}
+
+	public function setPaymentWindowAgreement($value)
+	{
+		return $this->setParameter('payment_window_agreement', $value);
+	}	
 
 	public function getAgreement()
 	{
@@ -54,6 +66,16 @@ class Gateway extends AbstractGateway
 	{
 		return $this->setParameter('agreement', $value);
 	}
+	
+	public function setPaymentWindowApikey($value)
+	{
+		return $this->setParameter('payment_window_apikey', $value);
+	}
+
+	public function getPaymentWindowApikey()
+	{
+		return $this->getParameter('payment_window_apikey');
+	}	
 
 	public function setApikey($value)
 	{
@@ -106,11 +128,11 @@ class Gateway extends AbstractGateway
 	 * Complete an authorization
 	 *
 	 * @param array $parameters
-	 * @return \Omnipay\Quickpay\Message\CompletePurchaseRequest
+	 * @return \Omnipay\Quickpay\Message\CompleteAuthorizeRequest
 	 */
 	public function completeAuthorize(array $parameters = array())
 	{
-		return $this->createRequest('\Omnipay\Quickpay\Message\CompletePurchaseRequest', $parameters);
+		return $this->completePurchase($parameters);
 	}
 
 	/**

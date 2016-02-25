@@ -40,7 +40,7 @@ class CompletePurchaseResponse extends AbstractResponse
 
 		// store this on merchant sites db!
 		//return isset($input->id) ? $input->id : '';
-		return 'order123';
+		return '123123123';
 	}
 
 }

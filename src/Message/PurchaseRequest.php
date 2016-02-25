@@ -24,17 +24,15 @@ class PurchaseRequest extends AbstractRequest
  		$data['amount'] = $this->getAmountInteger();
  		$data['currency'] = $this->getCurrency();
 		$data['cancelurl'] = $this->getCancelUrl();
-		//$data['callbackurl'] = $this->getNotifyUrl();
-		$data['callbackurl'] = 'http://requestb.in/17rcey61';
+		$data['callbackurl'] = $this->getNotifyUrl();
 		// specify redirect url here, after payment
 		$data['continueurl'] = $this->getReturnUrl();
 		// set language of payment window
 		$data['language'] = $this->getLanguage();
 		// if set to 1, will autocapture
-		$data['autocapture'] = 1;
+		$data['autocapture'] = 0;
 		// limit payment methods by setting this
 		$data['payment_methods'] = $this->getPaymentMethods();
-
 
 		return $this->form_fields($data);
 	}

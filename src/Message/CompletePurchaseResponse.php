@@ -36,11 +36,11 @@ class CompletePurchaseResponse extends AbstractResponse
 
 	public function getTransactionReference()
 	{
-		$input = json_decode($this->request);
+		//$input = json_decode($this->request);
 
 		// store this on merchant sites db!
 		//return isset($input->id) ? $input->id : '';
-		return '123123123';
+		return 'order123';
 	}
 
 }

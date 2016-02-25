@@ -12,20 +12,20 @@ class CaptureRequest extends PurchaseRequest
 // currently not working
 	protected $endpoint = 'http://api.quickpay.net';
 
-	public function getData()
-	{
+    public function getData()
+    {
 		$data = parent::getData();
-		return $data;
-	}
+        return $data;
+    }
 
 	public function getHttpMethod(){
 		return 'POST';
 	}
 
-	/**
-	 * @param mixed $data
-	 * @return CaptureResponse
-	 */
+    /**
+     * @param mixed $data
+     * @return CaptureResponse
+     */
 	public function sendData($data)
 	{
 
@@ -47,15 +47,15 @@ class CaptureRequest extends PurchaseRequest
 	}
 
 
-	/**
-	 * Send the request
-	 *
-	 * @return ResponseInterface
-	 */
-	public function send()
-	{
-		return $this->sendData($this->getData());
-	}
+    /**
+     * Send the request
+     *
+     * @return ResponseInterface
+     */
+    public function send()
+    {
+        return $this->sendData($this->getData());
+    }
 
 	public function getEndpoint()
 	{

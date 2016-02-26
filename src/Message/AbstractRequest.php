@@ -26,7 +26,7 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 	{
 		return $this->setParameter('agreement', $value);
 	}
-	
+
 	public function getPaymentWindowAgreement()
 	{
 		return $this->getParameter('payment_window_agreement');
@@ -35,7 +35,7 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 	public function setPaymentWindowAgreement($value)
 	{
 		return $this->setParameter('payment_window_agreement', $value);
-	}		
+	}
 
 	public function setApikey($value)
 	{
@@ -46,7 +46,7 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 	{
 		return $this->getParameter('apikey');
 	}
-	
+
 	public function setPaymentWindowApikey($value)
 	{
 		return $this->setParameter('payment_window_apikey', $value);
@@ -55,7 +55,7 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 	public function getPaymentWindowApikey()
 	{
 		return $this->getParameter('payment_window_apikey');
-	}		
+	}
 
 	public function getLanguage()
 	{

@@ -3,49 +3,40 @@
 namespace Omnipay\Quickpay\Message;
 
 use Omnipay\Common\Message\AbstractResponse;
-// in this response we should get some data from the gateway, to make sure of the status of the payment,
-// here we should also get acces to getTransactionReference() which should be stored in the projects DB, as a reference point to later capture the payment
-// it seems that Quickpay works annoyingly so they only send this response data to a callbackURL
+
 class CompletePurchaseResponse extends AbstractResponse
 {
-/*
- *  is called on main class
+
 	public function __construct($request, $data)
 	{
 		$this->request = $request;
+		// is json object
 		$this->data = $data;
 	}
 
-*/
-    public function isSuccessful()
-    {
-		//$status = $this->getCode();
-		// should check for valid codes in headers, not just return true
-		//if ($status == 200) {
-		//	return true;
-		//}
 
-		//if($this->data['checksum'] == $this->request['Quickpay-Checksum-Sha256']){
-		//	return true
-		//}
+	public function isSuccessful()
+	{
+		$status = $this->getCode();
+		if ($status == 20000) {
+			return true;
+		}
+		// always returns false on returnURL, because Quickpay returnURL get no data
+		// it can return true when looking at the data from the notifyURL
+		// your app should have a way to handle this, since the callback is also asynchronous!
+		return false;
+	}
 
-        // should make some checks
-		return true;
-    }
-
-	//public function getCode(){
-	//	return isset($this->request['operations']['qp_status_code']) ? $this->request['operations']['qp_status_code'] : '';
-	//}
+	public function getCode(){
+		return isset($this->data->qp_status_code) ? $this->data->qp_status_code : '';
+	}
 
 	public function getTransactionReference()
 	{
-		//$input = json_decode($this->request);
 
 		// store this on merchant sites db!
-		//return isset($input->id) ? $input->id : '';
-
-        // should of course return the correct data
-		return '123123123123';
+		return isset($this->data->id) ? $this->data->id : '';
+		//return '123123123123';
 	}
 
 }

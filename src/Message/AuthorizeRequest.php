@@ -9,11 +9,9 @@ class AuthorizeRequest extends PurchaseRequest
 {
 	public function getData()
 	{
-		$data = parent::getData();
-
+		$data = $this->getQuickpayParams();
 		$data['autocapture'] = 0;
-		
-		return $this->form_fields($data);
+		return $this->createChecksum($data);
 	}
 
 }

@@ -14,9 +14,10 @@ class Gateway extends AbstractGateway
 		return 'Quickpay';
 	}
 
-  
+
 	public function getDefaultParameters()
 	{
+		// FIXME: No need for this call.
 		parent::getDefaultParameters();
 		return array(
 			'merchant' => '',
@@ -46,7 +47,7 @@ class Gateway extends AbstractGateway
 	{
 		return $this->setParameter('merchant', $value);
 	}
-	
+
 	public function getPaymentWindowAgreement()
 	{
 		return $this->getParameter('payment_window_agreement');
@@ -55,7 +56,7 @@ class Gateway extends AbstractGateway
 	public function setPaymentWindowAgreement($value)
 	{
 		return $this->setParameter('payment_window_agreement', $value);
-	}	
+	}
 
 	public function getAgreement()
 	{
@@ -66,7 +67,7 @@ class Gateway extends AbstractGateway
 	{
 		return $this->setParameter('agreement', $value);
 	}
-	
+
 	public function setPaymentWindowApikey($value)
 	{
 		return $this->setParameter('payment_window_apikey', $value);
@@ -75,7 +76,7 @@ class Gateway extends AbstractGateway
 	public function getPaymentWindowApikey()
 	{
 		return $this->getParameter('payment_window_apikey');
-	}	
+	}
 
 	public function setApikey($value)
 	{

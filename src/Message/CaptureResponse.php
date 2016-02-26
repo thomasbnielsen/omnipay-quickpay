@@ -45,6 +45,7 @@ class CaptureResponse extends AbstractResponse implements RedirectResponseInterf
 
 	public function getRedirectMethod()
 	{
+		// FIXME: A redirect should nearly always be a GET. Is this really correct?
 		return 'POST';
 	}
 

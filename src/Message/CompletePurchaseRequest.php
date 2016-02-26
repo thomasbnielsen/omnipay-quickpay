@@ -17,6 +17,7 @@ class CompletePurchaseRequest extends PurchaseRequest
 
     public function sendData($data)
     {
+        // FIXME: You're not actually sending any data here.
         return $this->response = new CompletePurchaseResponse($this, $data);
     }
 

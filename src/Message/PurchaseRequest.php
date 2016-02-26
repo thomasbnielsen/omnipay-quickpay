@@ -70,11 +70,14 @@ class PurchaseRequest extends AbstractRequest
 
 	public function sendData($data)
     {
+		// FIXME: You're not actually sending any data here.
         return $this->response = new PurchaseResponse($this, $data);
     }
 
     /**
      * Send the request
+	 *
+	 * FIXME: This should probably be moved up into AbstractRequest
      *
      * @return ResponseInterface
      */

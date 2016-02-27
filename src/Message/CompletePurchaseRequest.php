@@ -39,7 +39,7 @@ class CompletePurchaseRequest extends PurchaseRequest
 			$header_checksum = $this->httpRequest->headers->get('Quickpay-Checksum-Sha256');
 			$our_checksum = $this->sign($params, $this->getPaymentWindowApikey());
 
-			//mail('sander@nobrainer.dk', 'Test', 'checksum from header: ' . $header_checksum . ' checksum we made: ' . $our_checksum);
+			// mail('sander@nobrainer.dk', 'Test', 'checksum from header: ' . $header_checksum . ' checksum we made: ' . $our_checksum);
 			if ($our_checksum != $header_checksum) {
 				throw new InvalidResponseException;
 			}

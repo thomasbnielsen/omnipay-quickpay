@@ -13,13 +13,13 @@ use Omnipay\Common\Message\RedirectResponseInterface;
 class CaptureResponse extends AbstractResponse implements RedirectResponseInterface
 {
 	protected $endpoint = 'http://api.quickpay.net';
-/*
-    public function isSuccessful()
-    {
-        $data = $this->getData();
-        return isset($data['captureResult']) && $data['captureResult'];
-    }
-*/
+	/*
+		public function isSuccessful()
+		{
+			$data = $this->getData();
+			return isset($data['captureResult']) && $data['captureResult'];
+		}
+	*/
 
 	public function __construct($request, $data)
 	{
@@ -40,7 +40,7 @@ class CaptureResponse extends AbstractResponse implements RedirectResponseInterf
 
 	public function getRedirectUrl()
 	{
-		return $this->endpoint.'/payments/12929167/capture';
+		return $this->endpoint.'/payments/' . $this->getTransactionReference() . '/capture?' . http_build_query($this->getRedirectData());
 	}
 
 	public function getRedirectMethod()

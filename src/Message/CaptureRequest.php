@@ -10,12 +10,14 @@ namespace Omnipay\Quickpay\Message;
 class CaptureRequest extends PurchaseRequest
 {
 // currently not working
-	protected $endpoint = 'http://api.quickpay.net';
+	protected $endpoint = 'https://api.quickpay.net';
 
 	public function getData()
 	{
-		$data = parent::getData();
-		return $data;
+		$data = array();
+		$data['id'] = $this->getTransactionReference();
+		$data['amount'] = $this->getAmountInteger();
+		return http_build_query($data);
 	}
 
 	public function getHttpMethod(){
@@ -28,8 +30,17 @@ class CaptureRequest extends PurchaseRequest
 	 */
 	public function sendData($data)
 	{
-
-		// modifying the request taken from Stripe driver
+		// don't throw exceptions for 4xx errors
+		/*
+        $this->httpClient->getEventDispatcher()->addListener(
+            'request.error',
+            function ($event) {
+                if ($event['response']->isClientError()) {
+                    $event->stopPropagation();
+                }
+            }
+        );		
+		*/
 		$httpRequest = $this->httpClient->createRequest(
 			$this->getHttpMethod(),
 			$this->getEndpoint(),
@@ -38,10 +49,8 @@ class CaptureRequest extends PurchaseRequest
 		);
 
 		$httpResponse = $httpRequest
-			->setHeader('Authorization', 'Basic '. base64_encode(":" . $this->getApiKey()))
-			->setHeader('Accept-Version:', ' v10')
-			///->setHeader('id', $this->getTransactionReference())
-			//->setHeader('amount', $this->getAmount())
+			->setHeader('Authorization', ' Basic '. base64_encode(":" . $this->getApiKey()))
+			->setHeader('Accept-Version', ' v10')
 			->send();
 
 		return $this->response = new CaptureResponse($this, $httpResponse);
@@ -60,8 +69,6 @@ class CaptureRequest extends PurchaseRequest
 
 	public function getEndpoint()
 	{
-		// old
-		//return "https://secure.quickpay.dk/form/";
 		return $this->endpoint;
 	}
 

@@ -19,34 +19,18 @@ class CompletePurchaseRequest extends PurchaseRequest
 		$data = $this->httpRequest->query->all();
 
 		// if its the notifyUrl (callback) being handled and not returnUrl
-		if($this->httpRequest->headers->get('Quickpay-Checksum-Sha256')){
-			$data = json_decode($this->httpRequest->getContent());
+		if($this->httpRequest->headers->get('Content-Type') == "application/json"){
+			$data = $this->httpRequest->getContent();
 
-			$params = array(
-				"version"      => $this->httpRequest->headers->get('Quickpay-Api-Version'),
-				"merchant_id"  => $this->getMerchant(),
-				"agreement_id" => $this->getPaymentWindowAgreement(),
-				"order_id"     => $data->order_id,
-				"amount"       => $this->getAmountInteger(),
-				"currency"     => $this->getCurrency(),
-				"continueurl" => $this->getReturnUrl(),
-				"cancelurl"   => $this->getCancelUrl(),
-				"callbackurl" => $this->getNotifyUrl(),
-				"language" => $this->getLanguage(),
-				"autocapture" => 0,
-				"payment_methods" => $this->getPaymentMethods()
-			);
 			$header_checksum = $this->httpRequest->headers->get('Quickpay-Checksum-Sha256');
-			$our_checksum = $this->sign($params, $this->getPaymentWindowApikey());
-
-			// mail('sander@nobrainer.dk', 'Test', 'checksum from header: ' . $header_checksum . ' checksum we made: ' . $our_checksum);
+			// validate with accounts private key.
+			$our_checksum = hash_hmac("sha256", $this->httpRequest->getContent(), $this->getPrivateKey());
 			if ($our_checksum != $header_checksum) {
 				throw new InvalidResponseException;
 			}
 		}
 		return $data;
 	}
-
 
 	public function sendData($data)
 	{

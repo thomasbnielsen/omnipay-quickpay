@@ -3,6 +3,7 @@
 namespace Omnipay\Quickpay\Message;
 
 use Omnipay\Common\Message\ResponseInterface;
+use Omnipay\Common\Exception\InvalidResponseException;
 
 /**
  * Quickpay Complete Purchase Request

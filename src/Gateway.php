@@ -23,6 +23,7 @@ class Gateway extends AbstractGateway
 			'payment_window_agreement' => '',
 			'apikey' => '',
 			'payment_window_apikey' => '',
+			'privatekey' => '',
 			'language' => '',
 			'payment_methods' => array()
 		);
@@ -84,6 +85,16 @@ class Gateway extends AbstractGateway
 	public function getApikey()
 	{
 		return $this->getParameter('apikey');
+	}
+
+	public function setPrivatekey($value)
+	{
+		return $this->setParameter('privatekey', $value);
+	}
+
+	public function getPrivatekey()
+	{
+		return $this->getParameter('privatekey');
 	}
 
 	public function getLanguage()

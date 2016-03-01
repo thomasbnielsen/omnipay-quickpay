@@ -23,10 +23,12 @@ class CompletePurchaseResponse extends AbstractResponse
 	}
 
 	public function getResponseBody(){
-		$response_body = json_decode($this->data);
-		if (json_last_error() === JSON_ERROR_NONE) {
-			// JSON is valid
-			return $response_body;
+		if(is_string($this->data)){
+			$response_body = json_decode($this->data);
+			if (json_last_error() === JSON_ERROR_NONE) {
+				// JSON is valid
+				return $response_body;
+			}
 		}
 		return false;
 	}

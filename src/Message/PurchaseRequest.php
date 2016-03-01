@@ -21,7 +21,7 @@ class PurchaseRequest extends AbstractRequest
 			"cancelurl"   => $this->getCancelUrl(),
 			"callbackurl" => $this->getNotifyUrl(),
 			"language" => $this->getLanguage(),
-			"autocapture" => 0,
+			"autocapture" => 1,
 			"payment_methods" => $this->getPaymentMethods()
 		);
 
@@ -33,50 +33,8 @@ class PurchaseRequest extends AbstractRequest
 		// checks if any of these are empty, so we can throw an error without calling the API
 		$this->validate('merchant', 'agreement', 'amount', 'transactionId');
 
-		/*
-		$data['version'] = "v10";
-		$data['merchant_id'] = $this->getMerchant();
-		$data['agreement_id'] = $this->getPaymentWindowAgreement();
-		// quickpay requires order numbers to be at least 4 characters long
-		$data['order_id'] = "orderID" . $this->getTransactionId();
- 		$data['amount'] = $this->getAmountInteger();
- 		$data['currency'] = $this->getCurrency();
-		$data['cancelurl'] = $this->getCancelUrl();
-		$data['callbackurl'] = $this->getNotifyUrl();
-		//$data['callbackurl'] = 'http://requestb.in/1h5j3h51';
-		// specify redirect url here, after payment
-		$data['continueurl'] = $this->getReturnUrl();
-		// set language of payment window
-		$data['language'] = $this->getLanguage(); 
-		// if set to 1, will autocapture
-		$data['autocapture'] = 0;
-		// limit payment methods by setting this
-		$data['payment_methods'] = $this->getPaymentMethods();
-		*/
-
 		return $this->createChecksum($this->getQuickpayParams());
 	}
-	/*
-		public function form_fields($input_data)
-		{
-
-			$valid_input_ordered = array('version', 'merchant_id', 'agreement_id', 'order_id', 'amount', 'currency', 'cancelurl', 'continueurl','callbackurl','autocapture', 'payment_methods', 'language');
-			// create array with our data
-			foreach($valid_input_ordered as $key)
-			{
-				if(isset($input_data[$key]))
-				{
-					$data_fields[$key] = $input_data[$key];
-				}
-			}
-			//create quickpay checksum
-			// api key is used
-			// this used to be called md5secret in the old quickpay platform
-			$data_fields['checksum'] = $this->sign($data_fields, $this->getPaymentWindowApikey());
-			return $data_fields;
-
-		}
-	*/
 
 	public function createChecksum($data){
 		$data["checksum"] = $this->sign($data, $this->getPaymentWindowApikey());
@@ -121,8 +79,6 @@ class PurchaseRequest extends AbstractRequest
 
 	public function getEndpoint()
 	{
-		// old
-		//return "https://secure.quickpay.dk/form/";
 		return 'https://payment.quickpay.net';
 	}
 

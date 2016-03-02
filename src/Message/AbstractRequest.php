@@ -17,6 +17,16 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 		return $this->setParameter('merchant', $value);
 	}
 
+	public function setPrivatekey($value)
+	{
+		return $this->setParameter('privatekey', $value);
+	}
+
+	public function getPrivatekey()
+	{
+		return $this->getParameter('privatekey');
+	}
+
 	public function getAgreement()
 	{
 		return $this->getParameter('agreement');

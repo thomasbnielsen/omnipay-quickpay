@@ -1,6 +1,5 @@
 <?php
 
-// TODO
 
 namespace Omnipay\Quickpay\Message;
 
@@ -9,67 +8,38 @@ namespace Omnipay\Quickpay\Message;
  */
 class CaptureRequest extends PurchaseRequest
 {
-// currently not working
-	protected $endpoint = 'https://api.quickpay.net';
+	protected $endpoint = 'https://api.quickpay.net/';
 
 	public function getData()
 	{
-		$data = array();
-		$data['id'] = $this->getTransactionReference();
-		$data['amount'] = $this->getAmountInteger();
-		return http_build_query($data);
+		$data = array(
+			'id' => $this->getTransactionReference(),
+			'amount' => $this->getAmountInteger()
+		);
+		return $data;
 	}
 
-	public function getHttpMethod(){
+	public function getHttpMethod()
+	{
 		return 'POST';
 	}
 
-	/**
-	 * @param mixed $data
-	 * @return CaptureResponse
-	 */
 	public function sendData($data)
 	{
-		// don't throw exceptions for 4xx errors
-		/*
-        $this->httpClient->getEventDispatcher()->addListener(
-            'request.error',
-            function ($event) {
-                if ($event['response']->isClientError()) {
-                    $event->stopPropagation();
-                }
-            }
-        );		
-		*/
 		$httpRequest = $this->httpClient->createRequest(
 			$this->getHttpMethod(),
-			$this->getEndpoint(),
+			$this->endpoint . 'payments/' . $this->getTransactionReference() . '/capture?synchronized',
 			null,
 			$data
-		);
-
-		$httpResponse = $httpRequest
-			->setHeader('Authorization', ' Basic '. base64_encode(":" . $this->getApiKey()))
+		)->setHeader('Authorization', ' Basic '. base64_encode(":" . $this->getApiKey()))
 			->setHeader('Accept-Version', ' v10')
-			->send();
+			->setHeader('QuickPay-Callback-Url', $this->getNotifyUrl());
 
-		return $this->response = new CaptureResponse($this, $httpResponse);
+		return $httpRequest->send();
 	}
 
-
-	/**
-	 * Send the request
-	 *
-	 * @return ResponseInterface
-	 */
 	public function send()
 	{
 		return $this->sendData($this->getData());
 	}
-
-	public function getEndpoint()
-	{
-		return $this->endpoint;
-	}
-
 }

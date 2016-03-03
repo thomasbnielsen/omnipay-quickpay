@@ -161,6 +161,35 @@ class Gateway extends AbstractGateway
 	}
 
 	/**
+	 * @param array $parameters
+	 * @return \Omnipay\Quickpay\Message\CancelRequest
+	 */
+	public function cancel(array $parameters = array())
+	{
+		return $this->createRequest('\Omnipay\Quickpay\Message\CancelRequest', $parameters);
+	}
+
+	/**
+	 * @param array $parameters
+	 * @return \Omnipay\Quickpay\Message\CancelRequest
+	 */
+	public function refund(array $parameters = array())
+	{
+		return $this->createRequest('\Omnipay\Quickpay\Message\RefundRequest', $parameters);
+	}
+
+	/**
+	 * A complete request
+	 *
+	 * @param array $parameters
+	 * @return \Omnipay\Quickpay\Message\CompleteRequest
+	 */
+	public function completeRequest(array $parameters = array())
+	{
+		return $this->createRequest('\Omnipay\Quickpay\Message\CompleteRequest', $parameters);
+	}
+
+	/**
 	 * Complete capture
 	 *
 	 * @param array $parameters
@@ -168,7 +197,29 @@ class Gateway extends AbstractGateway
 	 */
 	public function completeCapture(array $parameters = array())
 	{
-		return $this->createRequest('\Omnipay\Quickpay\Message\CompleteRequest', $parameters);
+		return $this->completeRequest($parameters);
+	}
+
+	/**
+	 * Complete cancel
+	 *
+	 * @param array $parameters
+	 * @return \Omnipay\Quickpay\Message\CompleteRequest
+	 */
+	public function completeCancel(array $parameters = array())
+	{
+		return $this->completeRequest($parameters);
+	}
+
+	/**
+	 * Complete refund
+	 *
+	 * @param array $parameters
+	 * @return \Omnipay\Quickpay\Message\CompleteRequest
+	 */
+	public function completeRefund(array $parameters = array())
+	{
+		return $this->completeRequest($parameters);
 	}
 
 }

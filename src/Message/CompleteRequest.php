@@ -24,6 +24,7 @@ class CompleteRequest extends AbstractRequest
 				throw new InvalidResponseException;
 			}
 		}
+
 		return $data;
 	}
 

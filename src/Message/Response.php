@@ -11,7 +11,7 @@ class Response extends AbstractResponse
 		if($this->getResponseBody()){
 			$response_body = $this->getResponseBody();
 			$data = end($response_body->operations);
-			if ($data->qp_status_code=="20000" && ($data->aq_status_code=="000" || $data->aq_status_code=="20000")) {
+			if ($data->qp_status_code=="20000") {
 				return true;
 			}
 		}
@@ -36,5 +36,14 @@ class Response extends AbstractResponse
 			$response_body = $this->getResponseBody();
 		}
 		return isset($response_body->id) ? $response_body->id : '';
+	}
+
+	public function getCode(){
+		if($this->getResponseBody()){
+			$response_body = $this->getResponseBody();
+			$data = end($response_body->operations);
+			return isset($data->qp_status_code) ? $data->qp_status_code : '';
+		}
+		return null;
 	}
 } 

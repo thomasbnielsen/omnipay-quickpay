@@ -2,9 +2,10 @@
 
 namespace Omnipay\Quickpay\Message;
 
-class CompleteCaptureResponse extends CompletePurchaseResponse
-{
+use Omnipay\Common\Message\AbstractResponse;
 
+class Response extends AbstractResponse
+{
 	public function isSuccessful()
 	{
 		if($this->getResponseBody()){
@@ -36,5 +37,4 @@ class CompleteCaptureResponse extends CompletePurchaseResponse
 		}
 		return isset($response_body->id) ? $response_body->id : '';
 	}
-
-}
+} 

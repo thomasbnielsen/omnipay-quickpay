@@ -107,6 +107,12 @@ class Gateway extends AbstractGateway
 		return $this->setParameter('language', $value);
 	}
 
+	/**
+	 * Start an authorize request
+	 *
+	 * @param array $parameters array of options
+	 * @return \Omnipay\Quickpay\Message\AuthorizeRequest
+	 */
 	public function authorize(array $parameters = array())
 	{
 		return $this->createRequest('\Omnipay\Quickpay\Message\AuthorizeRequest', $parameters);
@@ -155,14 +161,14 @@ class Gateway extends AbstractGateway
 	}
 
 	/**
-	 * Complete caåtire
+	 * Complete capture
 	 *
 	 * @param array $parameters
-	 * @return \Omnipay\Quickpay\Message\CompleteCaptureRequest
+	 * @return \Omnipay\Quickpay\Message\CompleteRequest
 	 */
 	public function completeCapture(array $parameters = array())
 	{
-		return $this->createRequest('\Omnipay\Quickpay\Message\CompleteCaptureRequest', $parameters);
+		return $this->createRequest('\Omnipay\Quickpay\Message\CompleteRequest', $parameters);
 	}
 
 }

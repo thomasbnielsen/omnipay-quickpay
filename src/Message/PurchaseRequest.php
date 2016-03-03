@@ -9,6 +9,8 @@ namespace Omnipay\Quickpay\Message;
  */
 class PurchaseRequest extends AbstractRequest
 {
+	protected $endpoint = 'https://payment.quickpay.net';
+
 	public function getQuickpayParams()
 	{
 		$params = array(
@@ -72,19 +74,6 @@ class PurchaseRequest extends AbstractRequest
 		return $this->response = new PurchaseResponse($this, $data);
 	}
 
-	/**
-	 * Send the request
-	 *
-	 * @return ResponseInterface
-	 */
-	public function send()
-	{
-		return $this->sendData($this->getData());
-	}
-
-	public function getEndpoint()
-	{
-		return 'https://payment.quickpay.net';
-	}
+	public function getHttpMethod(){}
 
 }

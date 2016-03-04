@@ -10,28 +10,46 @@ use Omnipay\Common\Message\RedirectResponseInterface;
  */
 class PurchaseResponse extends AbstractResponse implements RedirectResponseInterface
 {
+	/**
+	 * @var string
+	 */
     protected $endpoint = 'https://payment.quickpay.net';
 
+	/**
+	 * @return bool
+	 */
     public function isSuccessful()
     {
         return false;
     }
 
+	/**
+	 * @return bool
+	 */
     public function isRedirect()
     {
         return true;
     }
 
+	/**
+	 * @return string
+	 */
     public function getRedirectUrl()
     {
         return $this->endpoint;
     }
 
+	/**
+	 * @return string
+	 */
     public function getRedirectMethod()
     {
         return 'POST';
     }
 
+	/**
+	 * @return mixed
+	 */
     public function getRedirectData()
     {
         return $this->data;

@@ -9,8 +9,14 @@ namespace Omnipay\Quickpay\Message;
  */
 class PurchaseRequest extends AbstractRequest
 {
+	/**
+	 * @var string
+	 */
 	protected $endpoint = 'https://payment.quickpay.net';
 
+	/**
+	 * @return array
+	 */
 	public function getQuickpayParams()
 	{
 		$params = array(
@@ -31,6 +37,9 @@ class PurchaseRequest extends AbstractRequest
 		return $params;
 	}
 
+	/**
+	 * @return array|mixed
+	 */
 	public function getData()
 	{
 		// checks if any of these are empty, so we can throw an error without calling the API
@@ -39,6 +48,10 @@ class PurchaseRequest extends AbstractRequest
 		return $this->createChecksum($this->getQuickpayParams());
 	}
 
+	/**
+	 * @param $data
+	 * @return mixed
+	 */
 	public function createChecksum($data)
 	{
 		$data["checksum"] = $this->sign($data, $this->getPaymentWindowApikey());
@@ -46,6 +59,11 @@ class PurchaseRequest extends AbstractRequest
 	}
 
 	// taken from quickpays PHP example on how to calculate checksum for the payment form
+	/**
+	 * @param $params
+	 * @param $api_key
+	 * @return string
+	 */
 	public function sign($params, $api_key)
 	{
 		$flattened_params = $this->flatten_params($params);
@@ -55,6 +73,12 @@ class PurchaseRequest extends AbstractRequest
 		return hash_hmac("sha256", $base, $api_key);
 	}
 
+	/**
+	 * @param $obj
+	 * @param array $result
+	 * @param array $path
+	 * @return array
+	 */
 	public function flatten_params($obj, $result = array(), $path = array())
 	{
 		if (is_array($obj)) {
@@ -68,12 +92,18 @@ class PurchaseRequest extends AbstractRequest
 		return $result;
 	}
 
-
+	/**
+	 * @param $data
+	 * @return mixed|PurchaseResponse
+	 */
 	public function sendData($data)
 	{
 		return $this->response = new PurchaseResponse($this, $data);
 	}
 
+	/**
+	 * @return string|void
+	 */
 	public function getHttpMethod(){}
 
 }

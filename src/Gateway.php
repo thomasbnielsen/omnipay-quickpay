@@ -171,11 +171,22 @@ class Gateway extends AbstractGateway
 
 	/**
 	 * @param array $parameters
-	 * @return \Omnipay\Quickpay\Message\CancelRequest
+	 * @return \Omnipay\Quickpay\Message\RefundRequest
 	 */
 	public function refund(array $parameters = array())
 	{
 		return $this->createRequest('\Omnipay\Quickpay\Message\RefundRequest', $parameters);
+	}
+
+	/**
+	 * Is used for callbacks coming in to the system
+	 * notify will verify these callbacks and eventually return the body of the callback to the app
+	 * @param array $parameters
+	 * @return \Omnipay\Quickpay\Message\NotifyRequest
+	 */
+	public function notify(array $parameters = array())
+	{
+		return $this->createRequest('\Omnipay\Quickpay\Message\NotifyRequest', $parameters);
 	}
 
 	/**

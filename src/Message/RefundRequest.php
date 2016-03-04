@@ -4,7 +4,7 @@
 namespace Omnipay\Quickpay\Message;
 
 /**
- * quickpay Capture Request
+ * quickpay Refund Request
  */
 class RefundRequest extends AbstractRequest
 {

@@ -5,7 +5,8 @@ namespace Omnipay\Quickpay\Message;
 use Omnipay\Common\Exception\InvalidResponseException;
 
 /**
- * Quickpay Complete Capture Request
+ * Quickpay Complete Request
+ * It is used to check data from a callback and send the json body onwards
  */
 class CompleteRequest extends AbstractRequest
 {

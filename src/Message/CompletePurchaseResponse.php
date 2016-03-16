@@ -8,7 +8,7 @@ class CompletePurchaseResponse extends Response
 	public function isSuccessful()
 	{
 		if($this->getResponseBody()){
-			$response_body = $this->getResponseBody();
+			$response_body = json_decode($this->getResponseBody());
 			$data = end($response_body->operations);
 			if ($response_body->accepted && $data->type=='authorize' && $data->qp_status_code=="20000") {
 				return true;

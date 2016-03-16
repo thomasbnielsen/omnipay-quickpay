@@ -12,7 +12,7 @@ class Response extends AbstractResponse
 	public function isSuccessful()
 	{
 		if($this->getResponseBody()){
-			$response_body = $this->getResponseBody();
+			$response_body = json_decode($this->getResponseBody());
 			$data = end($response_body->operations);
 			if ($data->qp_status_code=="20000") {
 				return true;
@@ -28,11 +28,8 @@ class Response extends AbstractResponse
 	 */
 	public function getResponseBody(){
 		if(is_string($this->data)){
-			$response_body = json_decode($this->data);
-			if (json_last_error() === JSON_ERROR_NONE) {
-				// JSON is valid
-				return $response_body;
-			}
+			// JSON is valid
+			return $this->data;
 		}
 		return false;
 	}
@@ -43,7 +40,7 @@ class Response extends AbstractResponse
 	public function getTransactionReference()
 	{
 		if($this->getResponseBody()){
-			$response_body = $this->getResponseBody();
+			$response_body = json_decode($this->getResponseBody());
 		}
 		return isset($response_body->id) ? $response_body->id : '';
 	}
@@ -53,7 +50,7 @@ class Response extends AbstractResponse
 	 */
 	public function getCode(){
 		if($this->getResponseBody()){
-			$response_body = $this->getResponseBody();
+			$response_body = json_decode($this->getResponseBody());
 			$data = end($response_body->operations);
 			return isset($data->qp_status_code) ? $data->qp_status_code : '';
 		}
@@ -65,7 +62,7 @@ class Response extends AbstractResponse
 	 */
 	public function getMessage(){
 		if($this->getResponseBody()){
-			$response_body = $this->getResponseBody();
+			$response_body = json_decode($this->getResponseBody());
 			$data = end($response_body->operations);
 			return isset($data->qp_status_msg) ? $data->type . ': ' . $data->qp_status_msg : '';
 		}

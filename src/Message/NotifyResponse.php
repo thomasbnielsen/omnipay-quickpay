@@ -8,7 +8,7 @@ class NotifyResponse extends Response
 	public function isSuccessful()
 	{
 		if($this->getResponseBody()){
-			$response_body = $this->getResponseBody();
+			$response_body = json_decode($this->getResponseBody());
 			$data = end($response_body->operations);
 			if ($data->qp_status_code=="20000") {
 				return true;

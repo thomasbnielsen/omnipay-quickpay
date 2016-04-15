@@ -10,9 +10,7 @@ class CompletePurchaseResponse extends Response
 		if($this->getResponseBody()){
 			$response_body = json_decode($this->getResponseBody());
 			$data = end($response_body->operations);
-			if ($response_body->accepted && $data->type=='authorize' && $data->qp_status_code=="20000" && $response_body->test_mode != true) {
-				return true;
-			}
+			return ($response_body->accepted && $data->type=='authorize' && $data->qp_status_code=="20000");
 		}
 
 		// always returns false on returnURL, because Quickpay returnURL get no data

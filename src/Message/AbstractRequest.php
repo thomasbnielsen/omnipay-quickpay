@@ -44,16 +44,28 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 	 */
 	public function sendData($data)
 	{
+		// prevent throwing exceptions for 4xx errors
+		$this->httpClient->getEventDispatcher()->addListener(
+			'request.error',
+			function ($event) {
+				if ($event['response']->isClientError()) {
+					$event->stopPropagation();
+				}
+			}
+		);
+		
 		$httpRequest = $this->httpClient->createRequest(
 			$this->getHttpMethod(),
 			$this->getEndPoint() . 'payments/' . $this->getTransactionReference() . '/' . $this->getApiMethod() . '?synchronized',
 			null,
 			$data
-		)->setHeader('Authorization', ' Basic '. base64_encode(":" . $this->getApiKey()))
+		)->setHeader('Authorization', ' Basic '. base64_encode(":" . $this->getApikey()))
 			->setHeader('Accept-Version', ' v10')
 			->setHeader('QuickPay-Callback-Url', $this->getNotifyUrl());
 
-		return $httpRequest->send();
+
+		$httpResponse = $httpRequest->send();
+		return $this->response = new Response($this, $httpResponse->getBody());
 	}
 
 	/**
@@ -138,23 +150,6 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 	}
 
 	/**
-	 * @return mixed
-	 */
-	public function getPaymentWindowAgreement()
-	{
-		return $this->getParameter('payment_window_agreement');
-	}
-
-	/**
-	 * @param $value
-	 * @return mixed
-	 */
-	public function setPaymentWindowAgreement($value)
-	{
-		return $this->setParameter('payment_window_agreement', $value);
-	}
-
-	/**
 	 * @param $value
 	 * @return mixed
 	 */
@@ -169,23 +164,6 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 	public function getApikey()
 	{
 		return $this->getParameter('apikey');
-	}
-
-	/**
-	 * @param $value
-	 * @return mixed
-	 */
-	public function setPaymentWindowApikey($value)
-	{
-		return $this->setParameter('payment_window_apikey', $value);
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getPaymentWindowApikey()
-	{
-		return $this->getParameter('payment_window_apikey');
 	}
 
 	/**

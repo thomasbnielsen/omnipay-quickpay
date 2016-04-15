@@ -22,7 +22,7 @@ class PurchaseRequest extends AbstractRequest
 		$params = array(
 			"version"      => "v10",
 			"merchant_id"  => $this->getMerchant(),
-			"agreement_id" => $this->getPaymentWindowAgreement(),
+			"agreement_id" => $this->getAgreement(),
 			"order_id"     => "orderID" . $this->getTransactionId(),
 			"amount"       => $this->getAmountInteger(),
 			"currency"     => $this->getCurrency(),
@@ -54,7 +54,7 @@ class PurchaseRequest extends AbstractRequest
 	 */
 	public function createChecksum($data)
 	{
-		$data["checksum"] = $this->sign($data, $this->getPaymentWindowApikey());
+		$data["checksum"] = $this->sign($data, $this->getApikey());
 		return $data;
 	}
 

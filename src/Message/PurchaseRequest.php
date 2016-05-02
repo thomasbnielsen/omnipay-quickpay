@@ -23,7 +23,7 @@ class PurchaseRequest extends AbstractRequest
 			"version"      => "v10",
 			"merchant_id"  => $this->getMerchant(),
 			"agreement_id" => $this->getPaymentWindowAgreement(),
-			"order_id"     => "orderID" . $this->getTransactionId(),
+			"order_id"     => $this->getTransactionId(),
 			"amount"       => $this->getAmountInteger(),
 			"currency"     => $this->getCurrency(),
 			"continueurl" => $this->getReturnUrl(),

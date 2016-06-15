@@ -31,6 +31,7 @@ class PurchaseRequest extends AbstractRequest
 			"callbackurl" => $this->getNotifyUrl(),
 			"language" => $this->getLanguage(),
 			"autocapture" => 1,
+			"google_analytics_tracking_id" => $this->getGoogleAnalyticsTrackingID(),
 			"payment_methods" => $this->getPaymentMethods()
 		);
 

@@ -219,4 +219,21 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 	public function setPaymentMethods($value = array()){
 		return $this->setParameter('payment_methods', $value);
 	}
+	
+	/**
+	 * @return mixed
+	 */
+	public function getGoogleAnalyticsTrackingID()
+	{
+		return $this->getParameter('google_analytics_tracking_id');
+	}
+
+	/**
+	 * @param $value
+	 * @return \Omnipay\Common\Message\AbstractRequest
+	 */
+	public function setGoogleAnalyticsTrackingID($value)
+	{
+		return $this->setParameter('google_analytics_tracking_id', $value);
+	}
 }

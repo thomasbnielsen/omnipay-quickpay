@@ -19,7 +19,7 @@
 		}
 	],
 	"require": {
-		"omnipay/common": "~2.0"
+		"omnipay/common": "~2.4"
 	},
 	"autoload": {
 		"psr-4": { "Omnipay\\Quickpay\\" : "src/" }

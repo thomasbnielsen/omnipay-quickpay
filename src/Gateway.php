@@ -10,15 +10,22 @@ use Omnipay\Quickpay\Message\Notification;
  */
 class Gateway extends AbstractGateway
 {
+	/**
+	 * @return string
+	 */
 	public function getName()
 	{
 		return 'Quickpay';
 	}
 
+	/**
+	 * @return array
+	 */
 	public function getDefaultParameters()
 	{
 		parent::getDefaultParameters();
 		return array(
+			'type' => '',
 			'merchant' => '',
 			'agreement' => '',
 			'apikey' => '',
@@ -29,70 +36,136 @@ class Gateway extends AbstractGateway
 		);
 	}
 
+	/**
+	 * @return array
+	 */
 	public function getPaymentMethods(){
 		return $this->getParameter('payment_methods');
 	}
 
+	/**
+	 * @param array $value
+	 * @return mixed
+	 */
 	public function setPaymentMethods($value = array()){
 		return $this->setParameter('payment_methods', $value);
 	}
 
+	/**
+	 * @return int
+	 */
 	public function getMerchant()
 	{
 		return $this->getParameter('merchant');
 	}
 
+	/**
+	 * @param $value
+	 * @return mixed
+	 */
 	public function setMerchant($value)
 	{
 		return $this->setParameter('merchant', $value);
 	}
 
+	/**
+	 * @return int
+	 */
 	public function getAgreement()
 	{
 		return $this->getParameter('agreement');
 	}
 
+	/**
+	 * @param $value
+	 * @return mixed
+	 */
 	public function setAgreement($value)
 	{
 		return $this->setParameter('agreement', $value);
 	}
 
+	/**
+	 * @param $value
+	 * @return mixed
+	 */
 	public function setApikey($value)
 	{
 		return $this->setParameter('apikey', $value);
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getApikey()
 	{
 		return $this->getParameter('apikey');
 	}
 
+	/**
+	 * @param $value
+	 * @return mixed
+	 */
 	public function setPrivatekey($value)
 	{
 		return $this->setParameter('privatekey', $value);
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getPrivatekey()
 	{
 		return $this->getParameter('privatekey');
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getLanguage()
 	{
 		return $this->getParameter('language');
 	}
 
+	/**
+	 * @param $value
+	 * @return mixed
+	 */
 	public function setLanguage($value)
 	{
 		return $this->setParameter('language', $value);
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getGoogleAnalyticsTrackingID()
 	{
 		return $this->getParameter('google_analytics_tracking_id');
 	}
 
+	/**
+	 * @param $value
+	 * @return mixed
+	 */
 	public function setGoogleAnalyticsTrackingID($value)
+	{
+		return $this->setParameter('google_analytics_tracking_id', $value);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getType()
+	{
+		return $this->getParameter('type');
+	}
+
+	/**
+	 * @param $value
+	 * @return mixed
+	 */
+	public function setType($value)
 	{
 		return $this->setParameter('google_analytics_tracking_id', $value);
 	}
@@ -223,6 +296,9 @@ class Gateway extends AbstractGateway
 		return $this->completeRequest($parameters);
 	}
 
+	/**
+	 * @return Notification
+	 */
 	public function acceptNotification()
 	{
 		return new Notification($this->httpRequest, $this->getPrivatekey());

@@ -99,7 +99,7 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 	}
 
 	/**
-	 * @return mixed
+	 * @return int
 	 */
 	public function getMerchant()
 	{
@@ -125,7 +125,7 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 	}
 
 	/**
-	 * @return mixed
+	 * @return string
 	 */
 	public function getPrivatekey()
 	{
@@ -133,7 +133,7 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 	}
 
 	/**
-	 * @return mixed
+	 * @return int
 	 */
 	public function getAgreement()
 	{
@@ -159,7 +159,7 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 	}
 
 	/**
-	 * @return mixed
+	 * @return string
 	 */
 	public function getApikey()
 	{
@@ -167,7 +167,7 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 	}
 
 	/**
-	 * @return mixed
+	 * @return string
 	 */
 	public function getLanguage()
 	{
@@ -184,7 +184,7 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 	}
 
 	/**
-	 * @return mixed
+	 * @return array
 	 */
 	public function getPaymentMethods(){
 		return $this->getParameter('payment_methods');
@@ -199,7 +199,7 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 	}
 
 	/**
-	 * @return mixed
+	 * @return string
 	 */
 	public function getGoogleAnalyticsTrackingID()
 	{
@@ -208,9 +208,26 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 	/**
 	 *
 	 * @param $value
-	 * @return \Omnipay\Common\Message\AbstractRequest
+	 * @return mixed
 	 */
 	public function setGoogleAnalyticsTrackingID($value)
+	{
+		return $this->setParameter('google_analytics_tracking_id', $value);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getType()
+	{
+		return $this->getParameter('type');
+	}
+
+	/**
+	 * @param $value
+	 * @return mixed
+	 */
+	public function setType($value)
 	{
 		return $this->setParameter('google_analytics_tracking_id', $value);
 	}

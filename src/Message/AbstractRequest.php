@@ -56,7 +56,7 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 		
 		$httpRequest = $this->httpClient->createRequest(
 			$this->getHttpMethod(),
-			$this->getEndPoint() . 'payments/' . $this->getTransactionReference() . '/' . $this->getApiMethod() . '?synchronized',
+			$this->getEndPoint() . 'payments/' . $this->getTransactionReference() . '/' . $this->getApiMethod(),
 			null,
 			$data
 		)->setHeader('Authorization', ' Basic '. base64_encode(":" . $this->getApikey()))

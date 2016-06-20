@@ -3,6 +3,7 @@
 namespace Omnipay\Quickpay;
 
 use Omnipay\Common\AbstractGateway;
+use Omnipay\Quickpay\Message\Notification;
 
 /**
  * Quickpay Gateway
@@ -20,12 +21,9 @@ class Gateway extends AbstractGateway
 		return array(
 			'merchant' => '',
 			'agreement' => '',
-			'payment_window_agreement' => '',
 			'apikey' => '',
-			'payment_window_apikey' => '',
 			'privatekey' => '',
 			'language' => '',
-			'google_analytics_tracking_id' => '',
 			'payment_methods' => array()
 		);
 	}
@@ -48,16 +46,6 @@ class Gateway extends AbstractGateway
 		return $this->setParameter('merchant', $value);
 	}
 
-	public function getPaymentWindowAgreement()
-	{
-		return $this->getParameter('payment_window_agreement');
-	}
-
-	public function setPaymentWindowAgreement($value)
-	{
-		return $this->setParameter('payment_window_agreement', $value);
-	}
-
 	public function getAgreement()
 	{
 		return $this->getParameter('agreement');
@@ -66,16 +54,6 @@ class Gateway extends AbstractGateway
 	public function setAgreement($value)
 	{
 		return $this->setParameter('agreement', $value);
-	}
-
-	public function setPaymentWindowApikey($value)
-	{
-		return $this->setParameter('payment_window_apikey', $value);
-	}
-
-	public function getPaymentWindowApikey()
-	{
-		return $this->getParameter('payment_window_apikey');
 	}
 
 	public function setApikey($value)
@@ -106,16 +84,6 @@ class Gateway extends AbstractGateway
 	public function setLanguage($value)
 	{
 		return $this->setParameter('language', $value);
-	}
-	
-		public function getGoogleAnalyticsTrackingID()
-	{
-		return $this->getParameter('google_analytics_tracking_id');
-	}
-
-	public function setGoogleAnalyticsTrackingID($value)
-	{
-		return $this->setParameter('google_analytics_tracking_id', $value);
 	}
 
 	/**
@@ -244,4 +212,8 @@ class Gateway extends AbstractGateway
 		return $this->completeRequest($parameters);
 	}
 
+	public function acceptNotification()
+	{
+		return new Notification($this->httpRequest, $this->getPrivatekey());
+	}
 }

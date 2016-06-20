@@ -22,8 +22,8 @@ class PurchaseRequest extends AbstractRequest
 		$params = array(
 			"version"      => "v10",
 			"merchant_id"  => $this->getMerchant(),
-			"agreement_id" => $this->getPaymentWindowAgreement(),
-			"order_id"     => $this->getTransactionId(),
+			"agreement_id" => $this->getAgreement(),
+			"order_id"     => "orderID" . $this->getTransactionId(),
 			"amount"       => $this->getAmountInteger(),
 			"currency"     => $this->getCurrency(),
 			"continueurl" => $this->getReturnUrl(),
@@ -31,7 +31,6 @@ class PurchaseRequest extends AbstractRequest
 			"callbackurl" => $this->getNotifyUrl(),
 			"language" => $this->getLanguage(),
 			"autocapture" => 1,
-			"google_analytics_tracking_id" => $this->getGoogleAnalyticsTrackingID(),
 			"payment_methods" => $this->getPaymentMethods()
 		);
 
@@ -55,7 +54,7 @@ class PurchaseRequest extends AbstractRequest
 	 */
 	public function createChecksum($data)
 	{
-		$data["checksum"] = $this->sign($data, $this->getPaymentWindowApikey());
+		$data["checksum"] = $this->sign($data, $this->getApikey());
 		return $data;
 	}
 

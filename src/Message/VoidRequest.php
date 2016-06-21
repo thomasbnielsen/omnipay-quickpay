@@ -6,7 +6,7 @@ namespace Omnipay\Quickpay\Message;
 /**
  * quickpay Cancel Request
  */
-class CancelRequest extends AbstractRequest
+class VoidRequest extends AbstractRequest
 {
 	public function __construct($httpClient, $httpRequest)
 	{

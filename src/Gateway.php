@@ -245,9 +245,9 @@ class Gateway extends AbstractGateway
 	 * @param array $parameters
 	 * @return \Omnipay\Quickpay\Message\CancelRequest
 	 */
-	public function cancel(array $parameters = array())
+	public function void(array $parameters = array())
 	{
-		return $this->createRequest('\Omnipay\Quickpay\Message\CancelRequest', $parameters);
+		return $this->createRequest('\Omnipay\Quickpay\Message\VoidRequest', $parameters);
 	}
 
 	/**
@@ -298,7 +298,7 @@ class Gateway extends AbstractGateway
 	 * @param array $parameters
 	 * @return \Omnipay\Quickpay\Message\CompleteRequest
 	 */
-	public function completeCancel(array $parameters = array())
+	public function completeVoid(array $parameters = array())
 	{
 		return $this->completeRequest($parameters);
 	}

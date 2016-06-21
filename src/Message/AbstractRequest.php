@@ -231,4 +231,21 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 	{
 		return $this->setParameter('type', $value);
 	}
+
+	/**
+	 * @return string
+	 */
+	public function getDescription()
+	{
+		return $this->getParameter('description');
+	}
+
+	/**
+	 * @param $value
+	 * @return mixed
+	 */
+	public function setDescription($value)
+	{
+		return $this->setParameter('description', $value);
+	}
 }

@@ -36,6 +36,11 @@ class PurchaseRequest extends AbstractRequest
 			"payment_methods" => $this->getPaymentMethods()
 		);
 
+		// it seems description param is not always allowed, depending on the Type set
+		if($this->getDescription() != ''){
+			$params['description'] = $this->getDescription();
+		}
+
 		return $params;
 	}
 

@@ -32,6 +32,7 @@ class Gateway extends AbstractGateway
 			'privatekey' => '',
 			'language' => '',
 			'google_analytics_tracking_id' => '',
+			'description' => '',
 			'payment_methods' => array()
 		);
 	}
@@ -168,6 +169,23 @@ class Gateway extends AbstractGateway
 	public function setType($value)
 	{
 		return $this->setParameter('type', $value);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getDescription()
+	{
+		return $this->getParameter('description');
+	}
+
+	/**
+	 * @param $value
+	 * @return mixed
+	 */
+	public function setDescription($value)
+	{
+		return $this->setParameter('description', $value);
 	}
 
 	/**

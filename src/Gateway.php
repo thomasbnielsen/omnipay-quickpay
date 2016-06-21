@@ -167,7 +167,7 @@ class Gateway extends AbstractGateway
 	 */
 	public function setType($value)
 	{
-		return $this->setParameter('google_analytics_tracking_id', $value);
+		return $this->setParameter('type', $value);
 	}
 
 	/**

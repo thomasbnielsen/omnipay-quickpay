@@ -29,6 +29,7 @@ class PurchaseRequest extends AbstractRequest
 			"continueurl" => $this->getReturnUrl(),
 			"cancelurl"   => $this->getCancelUrl(),
 			"callbackurl" => $this->getNotifyUrl(),
+			"type" => $this->getType(),
 			"language" => $this->getLanguage(),
 			"google_analytics_tracking_id" => $this->getGoogleAnalyticsTrackingID(),
 			"autocapture" => 1,

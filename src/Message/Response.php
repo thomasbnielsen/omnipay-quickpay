@@ -14,7 +14,7 @@ class Response extends AbstractResponse
 		if($this->getResponseBody()){
 			$response_body = json_decode($this->getResponseBody());
 			$data = end($response_body->operations);
-			if ($data->qp_status_code=="20000") {
+			if ($response_body->accepted && $data->qp_status_code=="20000" && $response_body->test_mode != true) {
 				return true;
 			}
 		}

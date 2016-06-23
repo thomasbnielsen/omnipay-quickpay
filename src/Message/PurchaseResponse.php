@@ -8,7 +8,7 @@ use Omnipay\Common\Message\RedirectResponseInterface;
 /**
  * Quickpay Purchase Response
  */
-class PurchaseResponse extends AbstractResponse implements RedirectResponseInterface
+class PurchaseResponse extends Response implements RedirectResponseInterface
 {
 	/**
 	 * @var string

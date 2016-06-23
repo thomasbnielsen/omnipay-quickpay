@@ -44,19 +44,22 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 	 */
 	public function sendData($data)
 	{
+		// TODO this seems to break api actions... what to do
 		// prevent throwing exceptions for 4xx errors
-		$this->httpClient->getEventDispatcher()->addListener(
-			'request.error',
-			function ($event) {
-				if ($event['response']->isClientError()) {
-					$event->stopPropagation();
-				}
-			}
-		);
-		
+		//$this->httpClient->getEventDispatcher()->addListener(
+		//	'request.error',
+		//	function ($event) {
+		//		if ($event['response']->isClientError()) {
+		//			$event->stopPropagation();
+		//		}
+		//	}
+		//);
+
+		$url = $this->getEndPoint() . $this->getTypeOfRequest() . '/' . $this->getTransactionReference() . '/' . $this->getApiMethod();
+
 		$httpRequest = $this->httpClient->createRequest(
 			$this->getHttpMethod(),
-			$this->getEndPoint() . 'payments/' . $this->getTransactionReference() . '/' . $this->getApiMethod(),
+			$url,
 			null,
 			$data
 		)->setHeader('Authorization', ' Basic '. base64_encode(":" . $this->getApikey()))
@@ -65,6 +68,7 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 
 
 		$httpResponse = $httpRequest->send();
+
 		return $this->response = new Response($this, $httpResponse->getBody());
 	}
 
@@ -74,6 +78,14 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 	public function send()
 	{
 		return $this->sendData($this->getData());
+	}
+
+	public function getTypeOfRequest(){
+		$type = 'payments';
+		if($this->getType() == 'subscription'){
+			$type = 'subscriptions';
+		}
+		return $type;
 	}
 
 	/**
@@ -247,5 +259,22 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 	public function setDescription($value)
 	{
 		return $this->setParameter('description', $value);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getOrderID()
+	{
+		return $this->getParameter('order_id');
+	}
+
+	/**
+	 * @param $value
+	 * @return mixed
+	 */
+	public function setOrderID($value)
+	{
+		return $this->setParameter('order_id', $value);
 	}
 }

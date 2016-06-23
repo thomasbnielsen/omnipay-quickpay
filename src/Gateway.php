@@ -33,6 +33,7 @@ class Gateway extends AbstractGateway
 			'language' => '',
 			'google_analytics_tracking_id' => '',
 			'description' => '',
+			'order_id' => '',
 			'payment_methods' => array()
 		);
 	}
@@ -189,6 +190,23 @@ class Gateway extends AbstractGateway
 	}
 
 	/**
+	 * @return string
+	 */
+	public function getOrderID()
+	{
+		return $this->getParameter('order_id');
+	}
+
+	/**
+	 * @param $value
+	 * @return mixed
+	 */
+	public function setOrderID($value)
+	{
+		return $this->setParameter('order_id', $value);
+	}
+
+	/**
 	 * Start an authorize request
 	 *
 	 * @param array $parameters array of options
@@ -211,28 +229,6 @@ class Gateway extends AbstractGateway
 	}
 
 	/**
-	 * Complete a purchase
-	 *
-	 * @param array $parameters
-	 * @return \Omnipay\Quickpay\Message\CompletePurchaseRequest
-	 */
-	public function completePurchase(array $parameters = array())
-	{
-		return $this->createRequest('\Omnipay\Quickpay\Message\CompletePurchaseRequest', $parameters);
-	}
-
-	/**
-	 * Complete an authorization
-	 *
-	 * @param array $parameters
-	 * @return \Omnipay\Quickpay\Message\CompletePurchaseRequest
-	 */
-	public function completeAuthorize(array $parameters = array())
-	{
-		return $this->completePurchase($parameters);
-	}
-
-	/**
 	 * @param array $parameters
 	 * @return \Omnipay\Quickpay\Message\CaptureRequest
 	 */
@@ -243,7 +239,7 @@ class Gateway extends AbstractGateway
 
 	/**
 	 * @param array $parameters
-	 * @return \Omnipay\Quickpay\Message\CancelRequest
+	 * @return \Omnipay\Quickpay\Message\VoidRequest
 	 */
 	public function void(array $parameters = array())
 	{
@@ -260,6 +256,15 @@ class Gateway extends AbstractGateway
 	}
 
 	/**
+	 * @param array $parameters
+	 * @return \Omnipay\Quickpay\Message\RefundRequest
+	 */
+	public function recurring(array $parameters = array())
+	{
+		return $this->createRequest('\Omnipay\Quickpay\Message\RecurringRequest', $parameters);
+	}
+
+	/**
 	 * Is used for callbacks coming in to the system
 	 * notify will verify these callbacks and eventually return the body of the callback to the app
 	 * @param array $parameters
@@ -268,6 +273,28 @@ class Gateway extends AbstractGateway
 	public function notify(array $parameters = array())
 	{
 		return $this->createRequest('\Omnipay\Quickpay\Message\NotifyRequest', $parameters);
+	}
+
+	/**
+	 * Complete a purchase
+	 *
+	 * @param array $parameters
+	 * @return \Omnipay\Quickpay\Message\CompleteRequest
+	 */
+	public function completePurchase(array $parameters = array())
+	{
+		return $this->completeRequest($parameters);
+	}
+
+	/**
+	 * Complete an authorization
+	 *
+	 * @param array $parameters
+	 * @return \Omnipay\Quickpay\Message\CompleteRequest
+	 */
+	public function completeAuthorize(array $parameters = array())
+	{
+		return $this->completeRequest($parameters);
 	}
 
 	/**
@@ -315,10 +342,23 @@ class Gateway extends AbstractGateway
 	}
 
 	/**
+	 * Complete recurring
+	 *
+	 * @param array $parameters
+	 * @return \Omnipay\Quickpay\Message\CompleteRequest
+	 */
+	public function completeRecurring(array $parameters = array())
+	{
+		return $this->completeRequest($parameters);
+	}
+
+	/**
 	 * @return Notification
 	 */
 	public function acceptNotification()
 	{
 		return new Notification($this->httpRequest, $this->getPrivatekey());
 	}
+
+
 }

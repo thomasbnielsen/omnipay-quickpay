@@ -236,4 +236,14 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 	{
 		return $this->setParameter('google_analytics_tracking_id', $value);
 	}
+
+	public function getGoogleAnalyticsClientID()
+	{
+		return $this->getParameter('google_analytics_client_id');
+	}
+
+	public function setGoogleAnalyticsClientID($value)
+	{
+		return $this->setParameter('google_analytics_client_id', $value);
+	}
 }

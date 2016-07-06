@@ -26,6 +26,7 @@ class Gateway extends AbstractGateway
 			'privatekey' => '',
 			'language' => '',
 			'google_analytics_tracking_id' => '',
+			'google_analytics_client_id' => '',
 			'payment_methods' => array()
 		);
 	}
@@ -108,7 +109,7 @@ class Gateway extends AbstractGateway
 		return $this->setParameter('language', $value);
 	}
 	
-		public function getGoogleAnalyticsTrackingID()
+	public function getGoogleAnalyticsTrackingID()
 	{
 		return $this->getParameter('google_analytics_tracking_id');
 	}
@@ -116,6 +117,16 @@ class Gateway extends AbstractGateway
 	public function setGoogleAnalyticsTrackingID($value)
 	{
 		return $this->setParameter('google_analytics_tracking_id', $value);
+	}
+
+	public function getGoogleAnalyticsClientID()
+	{
+		return $this->getParameter('google_analytics_client_id');
+	}
+
+	public function setGoogleAnalyticsClientID($value)
+	{
+		return $this->setParameter('google_analytics_client_id', $value);
 	}
 
 	/**

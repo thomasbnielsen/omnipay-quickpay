@@ -1,6 +1,15 @@
 # omnipay-quickpay
 A work in progress Omnipay driver for the Quickpay payment processor.
-##### Supported parameters
+### Supported Omnipay functionality
+* Authorize
+* Purchase
+* Capture
+* Refund
+* Void
+* Notification
+* Recurring (Not supported by Omnipay, but Quickpay has made this functionality very similar to regular payments)
+
+### Supported Quickpay parameters
 * type
 * merchant
 * agreement

@@ -22,17 +22,24 @@ class PurchaseRequest extends AbstractRequest
 		$params = array(
 			"version"      => "v10",
 			"merchant_id"  => $this->getMerchant(),
-			"agreement_id" => $this->getPaymentWindowAgreement(),
+			"agreement_id" => $this->getAgreement(),
 			"order_id"     => $this->getTransactionId(),
 			"amount"       => $this->getAmountInteger(),
 			"currency"     => $this->getCurrency(),
 			"continueurl" => $this->getReturnUrl(),
 			"cancelurl"   => $this->getCancelUrl(),
 			"callbackurl" => $this->getNotifyUrl(),
+			"type" => $this->getType(),
 			"language" => $this->getLanguage(),
+			"google_analytics_tracking_id" => $this->getGoogleAnalyticsTrackingID(),
 			"autocapture" => 1,
 			"payment_methods" => $this->getPaymentMethods()
 		);
+
+		// it seems description param is not always allowed, depending on the Type set
+		if($this->getDescription() != ''){
+			$params['description'] = $this->getDescription();
+		}
 
 		return $params;
 	}
@@ -54,7 +61,7 @@ class PurchaseRequest extends AbstractRequest
 	 */
 	public function createChecksum($data)
 	{
-		$data["checksum"] = $this->sign($data, $this->getPaymentWindowApikey());
+		$data["checksum"] = $this->sign($data, $this->getApikey());
 		return $data;
 	}
 

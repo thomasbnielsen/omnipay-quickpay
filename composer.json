@@ -18,9 +18,6 @@
 			"email": "sander@nobrainer.dk"
 		}
 	],
-	"require": {
-		"omnipay/common": "~2.0"
-	},
 	"autoload": {
 		"psr-4": { "Omnipay\\Quickpay\\" : "src/" }
 	},

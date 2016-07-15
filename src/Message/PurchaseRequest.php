@@ -34,6 +34,7 @@ class PurchaseRequest extends AbstractRequest
             "language"                     => $this->getLanguage(),
             "google_analytics_tracking_id" => $this->getGoogleAnalyticsTrackingID(),
             "autocapture"                  => 1,
+            "type"                         => $this->getType(),
             "payment_methods"              => $this->getPaymentMethods()
         );
 

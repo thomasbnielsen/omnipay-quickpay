@@ -1,0 +1,13 @@
+HTTP/1.1 201 Created
+Server: nginx
+Date: Sun, 24 Jan 2016 22:29:41 GMT
+Content-Type: application/json
+Content-Length: 43
+Connection: keep-alive
+Access-Control-Allow-Credentials: true
+Cache-Control: no-cache, no-store
+
+{
+  "id": 123123123,
+  "order_id": "0010"
+}

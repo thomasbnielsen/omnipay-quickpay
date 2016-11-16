@@ -1,5 +1,5 @@
 # omnipay-quickpay
-A work in progress Omnipay driver for the Quickpay payment processor.
+An Omnipay driver for the Quickpay payment processor.
 ### Supported Omnipay functionality
 * Authorize
 * Purchase

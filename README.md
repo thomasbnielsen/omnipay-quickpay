@@ -21,3 +21,4 @@ An Omnipay driver for the Quickpay payment processor.
 * description
 * order_id
 * payment_methods
+* synchronized (bool)

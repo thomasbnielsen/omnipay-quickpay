@@ -75,4 +75,46 @@ class CompleteRequestTest extends TestCase
 
     }
 
+
+    public function testGetUrl()
+    {
+        $this->request->initialize(
+            ['apikey' => 1, 'transactionId' => '10', 'agreement' => 2, 'amount' => 10.00, 'currency' => 'DKK']
+        );
+        $url = $this->request->getUrl();
+        $this->assertNotContains('?synchronized', $url);
+
+        foreach (['', 0, false, null] as $untruthyValue) {
+            $this->request->initialize(
+                [
+                    'apikey'        => 1,
+                    'transactionId' => '10',
+                    'agreement'     => 2,
+                    'amount'        => 10.00,
+                    'currency'      => 'DKK',
+                    'synchronized'  => $untruthyValue
+                ]
+            );
+            $url = $this->request->getUrl();
+            $this->assertNotContains('?synchronized', $url);
+        }
+
+        foreach (['1', 1, true, "synchronized"] as $truthyValue) {
+            $this->request->initialize(
+                [
+                    'apikey'        => 1,
+                    'transactionId' => '10',
+                    'agreement'     => 2,
+                    'amount'        => 10.00,
+                    'currency'      => 'DKK',
+                    'synchronized'  => $truthyValue
+                ]
+            );
+            $url = $this->request->getUrl();
+            $this->assertContains('?synchronized', $url);
+        }
+
+
+    }
+
 }

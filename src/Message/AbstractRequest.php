@@ -58,16 +58,15 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
      */
     public function sendData($data)
     {
-        // TODO this seems to break api actions... what to do
         // prevent throwing exceptions for 4xx errors
-        //$this->httpClient->getEventDispatcher()->addListener(
-        //	'request.error',
-        //	function ($event) {
-        //		if ($event['response']->isClientError()) {
-        //			$event->stopPropagation();
-        //		}
-        //	}
-        //);
+        $this->httpClient->getEventDispatcher()->addListener(
+        	'request.error',
+        	function ($event) {
+        		if ($event['response']->isClientError()) {
+        			$event->stopPropagation();
+        		}
+        	}
+        );
 
         $url = $this->getUrl();
         if (is_array($data) && array_key_exists('synchronized', $data)) {

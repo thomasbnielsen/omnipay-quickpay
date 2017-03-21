@@ -1,5 +1,5 @@
 {
-	"name": "nobrainerweb/omnipay-quickpay",
+	"name": "spysystem/omnipay-quickpay",
 	"type": "library",
 	"description": "Quickpay driver for the Omnipay payment library",
 	"keywords": [

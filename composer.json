@@ -23,9 +23,9 @@
 	},
 	"minimum-stability": "dev",
 	"require": {
-		"omnipay/common": "dev-master"
+		"omnipay/common": "^3@beta"
 	},
     "require-dev": {
-        "omnipay/tests": "dev-master"
+        "omnipay/tests": "^3"
     }
 }

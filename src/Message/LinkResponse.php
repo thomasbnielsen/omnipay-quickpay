@@ -19,15 +19,23 @@ class LinkResponse extends Response implements RedirectResponseInterface
 
     public function isSuccessful()
     {
-        $body = $this->getResponseBody();
-        $body = json_decode($body);
-        if (isset($body->url)) {
+		$data = json_decode($this->getResponseBody());
+        if (isset($data->url)) {
             return true;
         }
         return false;
     }
 
-    public function getTransactionReference()
+    public function getError()
+	{
+		$data = json_decode($this->getResponseBody());
+		if (isset($data->error)) {
+			return $data->error;
+		}
+		return null;
+	}
+
+	public function getTransactionReference()
     {
         return $this->reference;
     }
@@ -64,6 +72,4 @@ class LinkResponse extends Response implements RedirectResponseInterface
     {
         return [];
     }
-
-
 }

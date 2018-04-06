@@ -40,18 +40,18 @@ class Notification implements NotificationInterface
 
     public function getData()
     {
-        if($this->data){
+        if ($this->data){
             return $this->data;
         }
 
         if ($this->httpRequest->headers->get('Content-Type') == "application/json") {
             $data = json_decode($this->httpRequest->getContent());
 
-            $header_checksum = $this->httpRequest->headers->get('Quickpay-Checksum-Sha256');
+            $headerChecksum = $this->httpRequest->headers->get('Quickpay-Checksum-Sha256');
             // validate with accounts private key.
-            $our_checksum = hash_hmac("sha256", $this->httpRequest->getContent(), $this->getPrivateKey());
-            if ($our_checksum != $header_checksum) {
-                throw new InvalidResponseException;
+            $checksum = hash_hmac("sha256", $this->httpRequest->getContent(), $this->getPrivateKey());
+            if ($checksum != $headerChecksum) {
+                throw new InvalidResponseException("Checksum mismatch checksum:$checksum != header:$headerChecksum");
             }
 
             $this->data = $data;
@@ -80,13 +80,14 @@ class Notification implements NotificationInterface
      */
     public function getTransactionStatus()
     {
-        if($data = $this->getData()){
-            $op = end($data->operations);
-            if($op->pending == false && $op->qp_status_code == "20000"){
-                return NotificationInterface::STATUS_COMPLETED;
-            } else if($op->pending){
-                return NotificationInterface::STATUS_PENDING;
-            }
+        if ($data = $this->getData()){
+            if ($op = $this->getLatestOperation()) {
+				if ($op->pending == false && $op->qp_status_code == "20000") {
+					return NotificationInterface::STATUS_COMPLETED;
+				} else if ($op->pending) {
+					return NotificationInterface::STATUS_PENDING;
+				}
+			}
         }
 
         return NotificationInterface::STATUS_FAILED;
@@ -99,10 +100,23 @@ class Notification implements NotificationInterface
      */
     public function getMessage()
     {
-        if($data = $this->getData()){
-            $op = end($data->operations);
-            return $op->qp_status_msg;
+        if ($data = $this->getData()){
+            if ($op = $this->getLatestOperation()) {
+				return $op->qp_status_msg;
+			}
         }
         return '';
     }
+
+	/**
+	 * Get latest operation
+	 *
+	 * @return bool|mixed
+	 */
+    public function getLatestOperation() {
+		if ($data = $this->getData()) {
+			return end($data->operations);
+		}
+		return false;
+	}
 }

@@ -7,6 +7,9 @@ use Omnipay\Quickpay\Message\Notification;
 
 /**
  * Quickpay Gateway
+ * @method \Omnipay\Common\Message\RequestInterface createCard(array $options = array())
+ * @method \Omnipay\Common\Message\RequestInterface updateCard(array $options = array())
+ * @method \Omnipay\Common\Message\RequestInterface deleteCard(array $options = array())
  */
 class Gateway extends AbstractGateway
 {
@@ -23,8 +26,6 @@ class Gateway extends AbstractGateway
 	 */
 	public function getDefaultParameters()
 	{
-		parent::getDefaultParameters();
-
 		return array(
 			'type'                         => '',
 			'merchant'                     => '',
@@ -251,9 +252,9 @@ class Gateway extends AbstractGateway
 	 * @param array $parameters array of options
 	 * @return \Omnipay\Quickpay\Message\AuthorizeRequest
 	 */
-	public function authorize(array $parameters = array())
+	public function authorize(array $options = array())
 	{
-		return $this->createRequest('\Omnipay\Quickpay\Message\AuthorizeRequest', $parameters);
+		return $this->createRequest('\Omnipay\Quickpay\Message\AuthorizeRequest', $options);
 	}
 
 	/**
@@ -405,4 +406,10 @@ class Gateway extends AbstractGateway
 	}
 
 
+	function __call($name, $arguments)
+	{
+		// TODO: Implement @method \Omnipay\Common\Message\RequestInterface createCard(array $options = array())
+		// TODO: Implement @method \Omnipay\Common\Message\RequestInterface updateCard(array $options = array())
+		// TODO: Implement @method \Omnipay\Common\Message\RequestInterface deleteCard(array $options = array())
+	}
 }

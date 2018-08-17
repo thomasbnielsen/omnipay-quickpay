@@ -73,19 +73,19 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         if (is_array($data) && array_key_exists('synchronized', $data)) {
             unset($data['synchronized']);
         }
-        $httpRequest = $this->httpClient->createRequest(
+		$httpResponse = $this->httpClient->request(
             $this->getHttpMethod(),
             $url,
-            null,
+            [
+				'Authorization' => 'Basic ' . base64_encode(":" . $this->getApikey()),
+				'Accept-Version' => 'v10',
+				'Content-Type' => 'application/json',
+				'QuickPay-Callback-Url' => $this->getNotifyUrl()
+			],
             $data
-        )->setHeader('Authorization', ' Basic ' . base64_encode(":" . $this->getApikey()))
-            ->setHeader('Accept-Version', ' v10')
-            ->setHeader('QuickPay-Callback-Url', $this->getNotifyUrl());
+        );
 
-
-        $httpResponse = $httpRequest->send();
-
-        return $this->response = new Response($this, $httpResponse->getBody(true));
+        return $this->response = new Response($this, $httpResponse->getBody()->getContents());
     }
 
     /**

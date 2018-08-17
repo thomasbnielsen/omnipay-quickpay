@@ -3,8 +3,6 @@
 
 namespace Omnipay\Quickpay\Message;
 
-
-use Guzzle\Http\Exception\ClientErrorResponseException;
 use Omnipay\Common\Exception\InvalidRequestException;
 
 class LinkRequest extends AbstractRequest
@@ -63,16 +61,14 @@ class LinkRequest extends AbstractRequest
                 'currency' => $fullData['currency'],
             ];
 
-            $httpRequest = $this->httpClient->createRequest('POST', $url, null, $data)
-                ->setHeader('Authorization', ' Basic ' . base64_encode(":" . $this->getApikey()))
-                ->setHeader('Accept-Version', ' v10')
-                ->setHeader('QuickPay-Callback-Url', $this->getNotifyUrl());
-            try {
-                $httpResponse = $httpRequest->send();
-            } catch (ClientErrorResponseException $e) {
-                $httpResponse = $e->getResponse();
-            }
-            $body     = $httpResponse->getBody(true);
+            $httpResponse = $this->httpClient->request('POST', $url, [
+				'Authorization' => 'Basic ' . base64_encode(":" . $this->getApikey()),
+				'Accept-Version' => 'v10',
+				'Content-Type' => 'application/json',
+				'QuickPay-Callback-Url' => $this->getNotifyUrl()
+			], json_encode($data));
+
+            $body     = $httpResponse->getBody()->getContents();
             $response = json_decode($body, true);
             if (array_key_exists('id', $response)) {
                 $reference = $response['id'];
@@ -85,21 +81,13 @@ class LinkRequest extends AbstractRequest
 
         $url = $this->getEndPoint() . '/' . $this->getTypeOfRequest() . '/' . $reference . '/link';
 
+        $httpResponse = $this->httpClient->request('PUT', $url, [
+			'Authorization' => 'Basic ' . base64_encode(":" . $this->getApikey()),
+			'Accept-Version' => 'v10',
+			'Content-Type' => 'application/json',
+			'QuickPay-Callback-Url' => $this->getNotifyUrl()
+		], json_encode($fullData));
 
-        $httpRequest = $this->httpClient->createRequest('PUT', $url, null, $fullData)
-            ->setHeader('Authorization', ' Basic ' . base64_encode(":" . $this->getApikey()))
-            ->setHeader('Accept-Version', ' v10')
-            ->setHeader('QuickPay-Callback-Url', $this->getNotifyUrl());
-
-        try {
-            $httpResponse = $httpRequest->send();
-        } catch (ClientErrorResponseException $e) {
-            $httpResponse = $e->getResponse();
-        }
-
-        return new LinkResponse($this, $httpResponse->getBody(true), $reference);
-
+        return new LinkResponse($this, $httpResponse->getBody()->getContents(), $reference);
     }
-
-
 }

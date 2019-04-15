@@ -2,336 +2,317 @@
 
 namespace Omnipay\Quickpay\Message;
 
+use GuzzleHttp\Exception\ClientException;
+
 /**
  * Quickpay Abstract Request
  */
 abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 {
 
-    /**
-     * @var string
-     */
-    protected $endpoint = 'https://api.quickpay.net/';
+	/** @var string */
+	protected $endpoint = 'https://api.quickpay.net/';
 
-    /**
-     * @var string
-     */
-    private $apimethod = 'capture';
+	/** @var string */
+	private $apimethod = 'capture';
 
-    /**
-     * @return string
-     */
-    public function getUrl()
-    {
-        $url = $this->getEndPoint() . $this->getTypeOfRequest() . '/' . $this->getTransactionReference(
-            ) . '/' . $this->getApiMethod();
-        if ($this->getSynchronized()) {
-            $url .= '?synchronized';
-            return $url;
-        }
-        return $url;
-    }
+	/**
+	 * @return string
+	 */
+	public function getUrl(): string
+	{
+		$url	= $this->getEndPoint() . $this->getTypeOfRequest() . '/' . $this->getTransactionReference() . '/' . $this->getApiMethod();
+		if($this->getSynchronized())
+		{
+			$url .= '?synchronized';
+			return $url;
+		}
+		return $url;
+	}
 
-    /**
-     * @return array
-     */
-    public function getData()
-    {
-        $data = array(
-            'id'     => $this->getTransactionReference(),
-            'amount' => $this->getAmountInteger()
-        );
-        return $data;
-    }
+	/**
+	 * @return array
+	 */
+	public function getData(): array
+	{
+		return [
+			'id'		=> $this->getTransactionReference(),
+			'amount'	=> $this->getAmountInteger()
+		];
+	}
 
-    /**
-     * @return string
-     */
-    public function getHttpMethod()
-    {
-        return 'POST';
-    }
+	/**
+	 * @return string
+	 */
+	public function getHttpMethod(): string
+	{
+		return 'POST';
+	}
 
-    /**
-     * @param $data
-     * @return mixed
-     */
-    public function sendData($data)
-    {
-        // prevent throwing exceptions for 4xx errors
-        $this->httpClient->getEventDispatcher()->addListener(
-        	'request.error',
-        	function ($event) {
-        		if ($event['response']->isClientError()) {
-        			$event->stopPropagation();
-        		}
-        	}
-        );
+	/**
+	 * @param mixed $data
+	 * @return Response
+	 */
+	public function sendData($data): Response
+	{
+		$arrHeaders	= [
+			'Authorization'			=> ' Basic '.base64_encode(':' . $this->getApikey()),
+			'Accept-Version'		=> ' v10',
+			'QuickPay-Callback-Url'	=> $this->getNotifyUrl()
+		];
 
-        $url = $this->getUrl();
-        if (is_array($data) && array_key_exists('synchronized', $data)) {
-            unset($data['synchronized']);
-        }
-        $httpRequest = $this->httpClient->createRequest(
-            $this->getHttpMethod(),
-            $url,
-            null,
-            $data
-        )->setHeader('Authorization', ' Basic ' . base64_encode(":" . $this->getApikey()))
-            ->setHeader('Accept-Version', ' v10')
-            ->setHeader('QuickPay-Callback-Url', $this->getNotifyUrl());
+		$url	= $this->getUrl();
+		if(is_array($data) && array_key_exists('synchronized', $data))
+		{
+			unset($data['synchronized']);
+			$data	= json_encode($data);
+		}
 
+		try {
+			$httpResponse	= $this->httpClient->request(
+				$this->getHttpMethod(),
+				$url,
+				$arrHeaders,
+				$data
+			);
+		}
+		catch(ClientException $e)
+		{
+			$httpResponse	= $e->getResponse();
+		}
 
-        $httpResponse = $httpRequest->send();
+		$this->response	= new Response($this, $httpResponse->getBody());
+		return $this->response;
+	}
 
-        return $this->response = new Response($this, $httpResponse->getBody(true));
-    }
+	/**
+	 * @return Response
+	 */
+	public function send(): Response
+	{
+		return $this->sendData($this->getData());
+	}
 
-    /**
-     * @return mixed
-     */
-    public function send()
-    {
-        return $this->sendData($this->getData());
-    }
+	public function getTypeOfRequest(): string
+	{
+		$type = 'payments';
+		if($this->getType() === 'subscription')
+		{
+			$type	= 'subscriptions';
+		}
+		return $type;
+	}
 
-    public function getTypeOfRequest()
-    {
-        $type = 'payments';
-        if ($this->getType() == 'subscription') {
-            $type = 'subscriptions';
-        }
-        return $type;
-    }
+	/**
+	 * @param $value
+	 * @return AbstractRequest
+	 */
+	public function setApiMethod($value): AbstractRequest
+	{
+		$this->apimethod = $value;
+		return $this;
+	}
 
-    /**
-     * @param $value
-     * @return mixed
-     */
-    public function setApiMethod($value)
-    {
-        $this->apimethod = $value;
-        return $this;
-    }
+	/**
+	 * @return string
+	 */
+	public function getApiMethod(): string
+	{
+		return $this->apimethod;
+	}
 
-    /**
-     * @return string
-     */
-    public function getApiMethod()
-    {
-        return $this->apimethod;
-    }
+	/**
+	 * @return string
+	 */
+	public function getEndPoint(): string
+	{
+		return $this->endpoint;
+	}
 
-    /**
-     * @return string
-     */
-    public function getEndPoint()
-    {
-        return $this->endpoint;
-    }
+	/**
+	 * @return int
+	 */
+	public function getMerchant(): int
+	{
+		return $this->getParameter('merchant');
+	}
 
-    /**
-     * @return int
-     */
-    public function getMerchant()
-    {
-        return $this->getParameter('merchant');
-    }
+	/**
+	 * @param $value
+	 * @return AbstractRequest
+	 */
+	public function setMerchant($value): AbstractRequest
+	{
+		return $this->setParameter('merchant', $value);
+	}
 
-    /**
-     * @param $value
-     * @return mixed
-     */
-    public function setMerchant($value)
-    {
-        return $this->setParameter('merchant', $value);
-    }
+	/**
+	 * @param $value
+	 * @return AbstractRequest
+	 */
+	public function setPrivatekey($value): AbstractRequest
+	{
+		return $this->setParameter('privatekey', $value);
+	}
 
-    /**
-     * @param $value
-     * @return mixed
-     */
-    public function setPrivatekey($value)
-    {
-        return $this->setParameter('privatekey', $value);
-    }
+	/**
+	 * @return string
+	 */
+	public function getPrivatekey(): string
+	{
+		return $this->getParameter('privatekey');
+	}
 
-    /**
-     * @return string
-     */
-    public function getPrivatekey()
-    {
-        return $this->getParameter('privatekey');
-    }
+	/**
+	 * @return int
+	 */
+	public function getAgreement(): int
+	{
+		return $this->getParameter('agreement');
+	}
 
-    /**
-     * @return int
-     */
-    public function getAgreement()
-    {
-        return $this->getParameter('agreement');
-    }
+	/**
+	 * @param $value
+	 * @return AbstractRequest
+	 */
+	public function setAgreement($value): AbstractRequest
+	{
+		return $this->setParameter('agreement', $value);
+	}
 
-    /**
-     * @param $value
-     * @return mixed
-     */
-    public function setAgreement($value)
-    {
-        return $this->setParameter('agreement', $value);
-    }
+	/**
+	 * @param $value
+	 * @return AbstractRequest
+	 */
+	public function setApikey($value): AbstractRequest
+	{
+		return $this->setParameter('apikey', $value);
+	}
 
-    /**
-     * @param $value
-     * @return mixed
-     */
-    public function setApikey($value)
-    {
-        return $this->setParameter('apikey', $value);
-    }
+	/**
+	 * @return string
+	 */
+	public function getApikey(): string
+	{
+		return $this->getParameter('apikey');
+	}
 
-    /**
-     * @return string
-     */
-    public function getApikey()
-    {
-        return $this->getParameter('apikey');
-    }
+	/**
+	 * @param $value
+	 * @return AbstractRequest
+	 */
+	public function setSynchronized($value): AbstractRequest
+	{
+		return $this->setParameter('synchronized', $value);
+	}
 
-    /**
-     * @param $value
-     * @return self
-     */
-    public function setSynchronized($value)
-    {
-        return $this->setParameter('synchronized', $value);
-    }
+	/**
+	 * @return bool
+	 */
+	public function getSynchronized(): bool
+	{
+		return (bool)$this->getParameter('synchronized');
+	}
 
-    /**
-     * @return boolean
-     */
-    public function getSynchronized()
-    {
-        return boolval($this->getParameter('synchronized'));
-    }
+	/**
+	 * @return string
+	 */
+	public function getLanguage(): string
+	{
+		return $this->getParameter('language');
+	}
 
-    /**
-     * @return string
-     */
-    public function getLanguage()
-    {
-        return $this->getParameter('language');
-    }
+	/**
+	 * @param $value
+	 * @return AbstractRequest
+	 */
+	public function setLanguage($value): AbstractRequest
+	{
+		return $this->setParameter('language', $value);
+	}
 
-    /**
-     * @param $value
-     * @return mixed
-     */
-    public function setLanguage($value)
-    {
-        return $this->setParameter('language', $value);
-    }
+	/**
+	 * @return array
+	 */
+	public function getPaymentMethods(): array
+	{
+		return $this->getParameter('payment_methods');
+	}
 
-    /**
-     * @return array
-     */
-    public function getPaymentMethods()
-    {
-        return $this->getParameter('payment_methods');
-    }
+	/**
+	 * @param array $value
+	 * @return AbstractRequest
+	 */
+	public function setPaymentMethods(array $value = []): AbstractRequest
+	{
+		return $this->setParameter('payment_methods', $value);
+	}
 
-    /**
-     * @param array $value
-     * @return mixed
-     */
-    public function setPaymentMethods($value = array())
-    {
-        return $this->setParameter('payment_methods', $value);
-    }
+	/**
+	 * @return string
+	 */
+	public function getGoogleAnalyticsTrackingID(): string
+	{
+		return $this->getParameter('google_analytics_tracking_id');
+	}
 
-    /**
-     * @return string
-     */
-    public function getGoogleAnalyticsTrackingID()
-    {
-        return $this->getParameter('google_analytics_tracking_id');
-    }
+	/**
+	 * @param $value
+	 * @return AbstractRequest
+	 */
+	public function setGoogleAnalyticsTrackingID($value): AbstractRequest
+	{
+		return $this->setParameter('google_analytics_tracking_id', $value);
+	}
 
-    /**
-     *
-     * @param $value
-     * @return mixed
-     */
-    public function setGoogleAnalyticsTrackingID($value)
-    {
-        return $this->setParameter('google_analytics_tracking_id', $value);
-    }
+	/**
+	 * @return string
+	 */
+	public function getGoogleAnalyticsClientID(): string
+	{
+		return $this->getParameter('google_analytics_client_id');
+	}
 
-    /**
-     * @return string
-     */
-    public function getGoogleAnalyticsClientID()
-    {
-        return $this->getParameter('google_analytics_client_id');
-    }
+	/**
+	 * @param $value
+	 * @return AbstractRequest
+	 */
+	public function setGoogleAnalyticsClientID($value): AbstractRequest
+	{
+		return $this->setParameter('google_analytics_client_id', $value);
+	}
 
-    /**
-     * @param $value
-     * @return mixed
-     */
-    public function setGoogleAnalyticsClientID($value)
-    {
-        return $this->setParameter('google_analytics_client_id', $value);
-    }
+	/**
+	 * @return string
+	 */
+	public function getType(): string
+	{
+		return $this->getParameter('type');
+	}
 
-    /**
-     * @return string
-     */
-    public function getType()
-    {
-        return $this->getParameter('type');
-    }
+	/**
+	 * @param $value
+	 * @return AbstractRequest
+	 */
+	public function setType($value): AbstractRequest
+	{
+		return $this->setParameter('type', $value);
+	}
 
-    /**
-     * @param $value
-     * @return mixed
-     */
-    public function setType($value)
-    {
-        return $this->setParameter('type', $value);
-    }
+	/**
+	 * @return string
+	 */
+	public function getOrderID(): string
+	{
+		return $this->getParameter('order_id');
+	}
 
-    /**
-     * @return string
-     */
-    public function getDescription()
-    {
-        return $this->getParameter('description');
-    }
-
-    /**
-     * @param $value
-     * @return mixed
-     */
-    public function setDescription($value)
-    {
-        return $this->setParameter('description', $value);
-    }
-
-    /**
-     * @return string
-     */
-    public function getOrderID()
-    {
-        return $this->getParameter('order_id');
-    }
-
-    /**
-     * @param $value
-     * @return mixed
-     */
-    public function setOrderID($value)
-    {
-        return $this->setParameter('order_id', $value);
-    }
+	/**
+	 * @param $value
+	 * @return AbstractRequest
+	 */
+	public function setOrderID($value): AbstractRequest
+	{
+		return $this->setParameter('order_id', $value);
+	}
 }

@@ -7,11 +7,13 @@ namespace Omnipay\Quickpay\Message;
  */
 class AuthorizeRequest extends PurchaseRequest
 {
-	public function getData()
+	/**
+	 * @return array
+	 */
+	public function getData(): array
 	{
-		$data = $this->getQuickpayParams();
-		$data['autocapture'] = 0;
+		$data					= $this->getQuickpayParams();
+		$data['autocapture']	= 0;
 		return $this->createChecksum($data);
 	}
-
 }

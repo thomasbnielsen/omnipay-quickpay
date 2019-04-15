@@ -10,99 +10,129 @@ use Symfony\Component\HttpFoundation\Request;
 class Notification implements NotificationInterface
 {
 
-    /**
-     * The HTTP request object.
-     *
-     * @var \Symfony\Component\HttpFoundation\Request
-     */
-    protected $httpRequest;
+	/**
+	 * The HTTP request object.
+	 *
+	 * @var Request
+	 */
+	protected $httpRequest;
 
-    protected $privateKey;
+	protected $privateKey;
 
-    protected $data;
+	protected $data;
 
-    public function setPrivateKey($value)
-    {
-        $this->privateKey = $value;
-        return $this;
-    }
+	/**
+	 * @param string $value
+	 * @return Notification
+	 */
+	public function setPrivateKey(string $value): Notification
+	{
+		$this->privateKey = $value;
+		return $this;
+	}
 
-    public function getPrivateKey()
-    {
-        return $this->privateKey;
-    }
+	/**
+	 * @return null|string
+	 */
+	public function getPrivateKey(): ?string
+	{
+		return $this->privateKey;
+	}
 
-    public function __construct(Request $request, $privateKey = null)
-    {
-        $this->httpRequest = $request;
-        $this->privateKey = $privateKey;
-    }
+	/**
+	 * Notification constructor.
+	 * @param Request $request
+	 * @param string|null $privateKey
+	 */
+	public function __construct(Request $request, string $privateKey = null)
+	{
+		$this->httpRequest = $request;
+		$this->privateKey = $privateKey;
+	}
 
-    public function getData()
-    {
-        if($this->data){
-            return $this->data;
-        }
+	public function getData()
+	{
+		if($this->data)
+		{
+			return $this->data;
+		}
 
-        if ($this->httpRequest->headers->get('Content-Type') == "application/json") {
-            $data = json_decode($this->httpRequest->getContent());
+		if($this->httpRequest->headers->get('Content-Type') === 'application/json')
+		{
+			$data				= json_decode($this->httpRequest->getContent());
+			$header_checksum	= $this->httpRequest->headers->get('Quickpay-Checksum-Sha256');
+			// validate with accounts private key.
+			$our_checksum		= hash_hmac('sha256', $this->httpRequest->getContent(), $this->getPrivateKey());
 
-            $header_checksum = $this->httpRequest->headers->get('Quickpay-Checksum-Sha256');
-            // validate with accounts private key.
-            $our_checksum = hash_hmac("sha256", $this->httpRequest->getContent(), $this->getPrivateKey());
-            if ($our_checksum != $header_checksum) {
-                throw new InvalidResponseException;
-            }
+			if($our_checksum !== $header_checksum)
+			{
+				throw new InvalidResponseException;
+			}
 
-            $this->data = $data;
-        }
+			$this->data = $data;
+		}
 
-        return $this->data;
-    }
+		return json_encode($this->data);
+	}
 
-    /**
-     * Gateway Reference
-     *
-     * @return string A reference provided by the gateway to represent this transaction
-     */
-    public function getTransactionReference()
-    {
-        if ($data = $this->getData()) {
-            return $data->id;
-        }
-    }
+	/**
+	 * Gateway Reference
+	 * A reference provided by the gateway to represent this transaction
+	 *
+	 * @return string|null
+	 * @throws InvalidResponseException
+	 */
+	public function getTransactionReference(): ?string
+	{
+		if($data = $this->getData())
+		{
+			return $data->id;
+		}
 
-    /**
-     * Was the transaction successful?
-     *
-     * @return string Transaction status, one of {@see STATUS_COMPLETED}, {@see #STATUS_PENDING},
-     * or {@see #STATUS_FAILED}.
-     */
-    public function getTransactionStatus()
-    {
-        if($data = $this->getData()){
-            $op = end($data->operations);
-            if($op->pending == false && $op->qp_status_code == "20000"){
-                return NotificationInterface::STATUS_COMPLETED;
-            } else if($op->pending){
-                return NotificationInterface::STATUS_PENDING;
-            }
-        }
+		return null;
+	}
 
-        return NotificationInterface::STATUS_FAILED;
-    }
+	/**
+	 * Was the transaction successful?
+	 *
+	 * Transaction status, one of {@see STATUS_COMPLETED}, {@see #STATUS_PENDING},
+	 * or {@see #STATUS_FAILED}.
+	 *
+	 * @return string
+	 * @throws InvalidResponseException
+	 */
+	public function getTransactionStatus(): string
+	{
+		if($data = $this->getData())
+		{
+			$op	= end($data->operations);
+			if($op->pending === false && $op->qp_status_code === '20000')
+			{
+				return NotificationInterface::STATUS_COMPLETED;
+			}
 
-    /**
-     * Response Message
-     *
-     * @return string A response message from the payment gateway
-     */
-    public function getMessage()
-    {
-        if($data = $this->getData()){
-            $op = end($data->operations);
-            return $op->qp_status_msg;
-        }
-        return '';
-    }
+			if($op->pending)
+			{
+				return NotificationInterface::STATUS_PENDING;
+			}
+		}
+
+		return NotificationInterface::STATUS_FAILED;
+	}
+
+	/**
+	 * Response Message
+	 * A response message from the payment gateway
+	 *
+	 * @return string
+	 * @throws InvalidResponseException
+	 */
+	public function getMessage(): string
+	{
+		if($data = $this->getData())
+		{
+			return end($data->operations)->qp_status_msg;
+		}
+		return '';
+	}
 }

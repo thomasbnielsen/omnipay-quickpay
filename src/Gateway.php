@@ -3,7 +3,17 @@
 namespace Omnipay\Quickpay;
 
 use Omnipay\Common\AbstractGateway;
+use Omnipay\Common\Exception\BadMethodCallException;
+use Omnipay\Quickpay\Message\AuthorizeRequest;
+use Omnipay\Quickpay\Message\CaptureRequest;
+use Omnipay\Quickpay\Message\CompleteRequest;
+use Omnipay\Quickpay\Message\LinkRequest;
 use Omnipay\Quickpay\Message\Notification;
+use Omnipay\Quickpay\Message\NotifyRequest;
+use Omnipay\Quickpay\Message\PurchaseRequest;
+use Omnipay\Quickpay\Message\RecurringRequest;
+use Omnipay\Quickpay\Message\RefundRequest;
+use Omnipay\Quickpay\Message\VoidRequest;
 
 /**
  * Quickpay Gateway
@@ -13,7 +23,7 @@ class Gateway extends AbstractGateway
 	/**
 	 * @return string
 	 */
-	public function getName()
+	public function getName(): string
 	{
 		return 'Quickpay';
 	}
@@ -21,30 +31,30 @@ class Gateway extends AbstractGateway
 	/**
 	 * @return array
 	 */
-	public function getDefaultParameters()
+	public function getDefaultParameters(): array
 	{
 		parent::getDefaultParameters();
 
-		return array(
-			'type'                         => '',
-			'merchant'                     => '',
-			'agreement'                    => '',
-			'apikey'                       => '',
-			'privatekey'                   => '',
-			'language'                     => '',
-			'google_analytics_tracking_id' => '',
-			'google_analytics_client_id'   => '',
-			'description'                  => '',
-			'order_id'                     => '',
-			'synchronized'                 => false,
-			'payment_methods'              => array()
-		);
+		return [
+			'type'							=> '',
+			'merchant'						=> '',
+			'agreement'						=> '',
+			'apikey'						=> '',
+			'privatekey'					=> '',
+			'language'						=> '',
+			'google_analytics_tracking_id'	=> '',
+			'google_analytics_client_id'	=> '',
+			'description'					=> '',
+			'order_id'						=> '',
+			'synchronized'					=> false,
+			'payment_methods'				=> array()
+		];
 	}
 
 	/**
 	 * @return array
 	 */
-	public function getPaymentMethods()
+	public function getPaymentMethods(): array
 	{
 		return $this->getParameter('payment_methods');
 	}
@@ -53,7 +63,7 @@ class Gateway extends AbstractGateway
 	 * @param array $value
 	 * @return mixed
 	 */
-	public function setPaymentMethods($value = array())
+	public function setPaymentMethods(array $value = [])
 	{
 		return $this->setParameter('payment_methods', $value);
 	}
@@ -61,7 +71,7 @@ class Gateway extends AbstractGateway
 	/**
 	 * @return int
 	 */
-	public function getMerchant()
+	public function getMerchant(): int
 	{
 		return $this->getParameter('merchant');
 	}
@@ -78,7 +88,7 @@ class Gateway extends AbstractGateway
 	/**
 	 * @return int
 	 */
-	public function getAgreement()
+	public function getAgreement(): int
 	{
 		return $this->getParameter('agreement');
 	}
@@ -93,10 +103,10 @@ class Gateway extends AbstractGateway
 	}
 
 	/**
-	 * @param $value
+	 * @param string $value
 	 * @return mixed
 	 */
-	public function setApikey($value)
+	public function setApikey(string $value)
 	{
 		return $this->setParameter('apikey', $value);
 	}
@@ -104,16 +114,16 @@ class Gateway extends AbstractGateway
 	/**
 	 * @return string
 	 */
-	public function getApikey()
+	public function getApikey(): string
 	{
 		return $this->getParameter('apikey');
 	}
 
 	/**
-	 * @param $value
+	 * @param string $value
 	 * @return mixed
 	 */
-	public function setPrivatekey($value)
+	public function setPrivatekey(string $value)
 	{
 		return $this->setParameter('privatekey', $value);
 	}
@@ -121,7 +131,7 @@ class Gateway extends AbstractGateway
 	/**
 	 * @return string
 	 */
-	public function getPrivatekey()
+	public function getPrivatekey(): string
 	{
 		return $this->getParameter('privatekey');
 	}
@@ -129,16 +139,16 @@ class Gateway extends AbstractGateway
 	/**
 	 * @return string
 	 */
-	public function getLanguage()
+	public function getLanguage(): string
 	{
 		return $this->getParameter('language');
 	}
 
 	/**
-	 * @param $value
+	 * @param string $value
 	 * @return mixed
 	 */
-	public function setLanguage($value)
+	public function setLanguage(string $value)
 	{
 		return $this->setParameter('language', $value);
 	}
@@ -146,16 +156,16 @@ class Gateway extends AbstractGateway
 	/**
 	 * @return string
 	 */
-	public function getGoogleAnalyticsTrackingID()
+	public function getGoogleAnalyticsTrackingID(): string
 	{
 		return $this->getParameter('google_analytics_tracking_id');
 	}
 
 	/**
-	 * @param $value
+	 * @param string $value
 	 * @return mixed
 	 */
-	public function setGoogleAnalyticsTrackingID($value)
+	public function setGoogleAnalyticsTrackingID(string $value)
 	{
 		return $this->setParameter('google_analytics_tracking_id', $value);
 	}
@@ -163,16 +173,16 @@ class Gateway extends AbstractGateway
 	/**
 	 * @return string
 	 */
-	public function getGoogleAnalyticsClientID()
+	public function getGoogleAnalyticsClientID(): string
 	{
 		return $this->getParameter('google_analytics_client_id');
 	}
 
 	/**
-	 * @param $value
+	 * @param string $value
 	 * @return mixed
 	 */
-	public function setGoogleAnalyticsClientID($value)
+	public function setGoogleAnalyticsClientID(string $value)
 	{
 		return $this->setParameter('google_analytics_client_id', $value);
 	}
@@ -180,16 +190,16 @@ class Gateway extends AbstractGateway
 	/**
 	 * @return string
 	 */
-	public function getType()
+	public function getType(): string
 	{
 		return $this->getParameter('type');
 	}
 
 	/**
-	 * @param $value
+	 * @param string $value
 	 * @return mixed
 	 */
-	public function setType($value)
+	public function setType(string $value)
 	{
 		return $this->setParameter('type', $value);
 	}
@@ -197,16 +207,16 @@ class Gateway extends AbstractGateway
 	/**
 	 * @return string
 	 */
-	public function getDescription()
+	public function getDescription(): string
 	{
 		return $this->getParameter('description');
 	}
 
 	/**
-	 * @param $value
+	 * @param string $value
 	 * @return mixed
 	 */
-	public function setDescription($value)
+	public function setDescription(string $value)
 	{
 		return $this->setParameter('description', $value);
 	}
@@ -214,25 +224,25 @@ class Gateway extends AbstractGateway
 	/**
 	 * @return string
 	 */
-	public function getOrderID()
+	public function getOrderID(): string
 	{
 		return $this->getParameter('order_id');
 	}
 
 	/**
-	 * @param $value
+	 * @param string $value
 	 * @return mixed
 	 */
-	public function setOrderID($value)
+	public function setOrderID(string $value)
 	{
 		return $this->setParameter('order_id', $value);
 	}
 
 	/**
-	 * @param $value
-	 * @return self
+	 * @param bool $value
+	 * @return Gateway
 	 */
-	public function setSynchronized($value)
+	public function setSynchronized(bool $value): Gateway
 	{
 		return $this->setParameter('synchronized', $value);
 	}
@@ -240,87 +250,87 @@ class Gateway extends AbstractGateway
 	/**
 	 * @return boolean
 	 */
-	public function getSynchronized()
+	public function getSynchronized(): bool
 	{
-		return boolval($this->getParameter('synchronized'));
+		return (bool)$this->getParameter('synchronized');
 	}
 
 	/**
 	 * Start an authorize request
 	 *
 	 * @param array $parameters array of options
-	 * @return \Omnipay\Quickpay\Message\AuthorizeRequest
+	 * @return AuthorizeRequest
 	 */
-	public function authorize(array $parameters = array())
+	public function authorize(array $parameters = []): AuthorizeRequest
 	{
-		return $this->createRequest('\Omnipay\Quickpay\Message\AuthorizeRequest', $parameters);
+		return $this->createRequest(AuthorizeRequest::class, $parameters);
 	}
 
 	/**
 	 * Start a purchase request
 	 *
 	 * @param array $parameters array of options
-	 * @return \Omnipay\Quickpay\Message\PurchaseRequest
+	 * @return PurchaseRequest
 	 */
-	public function purchase(array $parameters = array())
+	public function purchase(array $parameters = []): PurchaseRequest
 	{
-		return $this->createRequest('\Omnipay\Quickpay\Message\PurchaseRequest', $parameters);
+		return $this->createRequest(PurchaseRequest::class, $parameters);
 	}
 
 	/**
 	 * @param array $parameters
-	 * @return \Omnipay\Quickpay\Message\CaptureRequest
+	 * @return CaptureRequest
 	 */
-	public function capture(array $parameters = array())
+	public function capture(array $parameters = []): CaptureRequest
 	{
-		return $this->createRequest('\Omnipay\Quickpay\Message\CaptureRequest', $parameters);
+		return $this->createRequest(CaptureRequest::class, $parameters);
 	}
 
 	/**
 	 * @param array $parameters
-	 * @return \Omnipay\Quickpay\Message\VoidRequest
+	 * @return VoidRequest
 	 */
-	public function void(array $parameters = array())
+	public function void(array $parameters = []): VoidRequest
 	{
-		return $this->createRequest('\Omnipay\Quickpay\Message\VoidRequest', $parameters);
+		return $this->createRequest(VoidRequest::class, $parameters);
 	}
 
 	/**
 	 * @param array $parameters
-	 * @return \Omnipay\Quickpay\Message\RefundRequest
+	 * @return RefundRequest
 	 */
-	public function refund(array $parameters = array())
+	public function refund(array $parameters = []): RefundRequest
 	{
-		return $this->createRequest('\Omnipay\Quickpay\Message\RefundRequest', $parameters);
+		return $this->createRequest(RefundRequest::class, $parameters);
 	}
 
 	/**
 	 * @param array $parameters
-	 * @return \Omnipay\Quickpay\Message\RefundRequest
+	 * @return RecurringRequest
 	 */
-	public function recurring(array $parameters = array())
+	public function recurring(array $parameters = []): RecurringRequest
 	{
-		return $this->createRequest('\Omnipay\Quickpay\Message\RecurringRequest', $parameters);
+		return $this->createRequest(RecurringRequest::class, $parameters);
 	}
 
 	/**
 	 * Is used for callbacks coming in to the system
 	 * notify will verify these callbacks and eventually return the body of the callback to the app
 	 * @param array $parameters
-	 * @return \Omnipay\Quickpay\Message\NotifyRequest
+	 * @return NotifyRequest
 	 */
-	public function notify(array $parameters = array())
+	public function notify(array $parameters = []): NotifyRequest
 	{
-		return $this->createRequest('\Omnipay\Quickpay\Message\NotifyRequest', $parameters);
+		return $this->createRequest(NotifyRequest::class, $parameters);
 	}
 
 	/**
 	 * Complete a purchase
 	 *
 	 * @param array $parameters
-	 * @return \Omnipay\Quickpay\Message\CompleteRequest
+	 * @return CompleteRequest
 	 */
-	public function completePurchase(array $parameters = array())
+	public function completePurchase(array $parameters = []): CompleteRequest
 	{
 		return $this->completeRequest($parameters);
 	}
@@ -329,9 +339,9 @@ class Gateway extends AbstractGateway
 	 * Complete an authorization
 	 *
 	 * @param array $parameters
-	 * @return \Omnipay\Quickpay\Message\CompleteRequest
+	 * @return CompleteRequest
 	 */
-	public function completeAuthorize(array $parameters = array())
+	public function completeAuthorize(array $parameters = []): CompleteRequest
 	{
 		return $this->completeRequest($parameters);
 	}
@@ -340,20 +350,20 @@ class Gateway extends AbstractGateway
 	 * A complete request
 	 *
 	 * @param array $parameters
-	 * @return \Omnipay\Quickpay\Message\CompleteRequest
+	 * @return CompleteRequest
 	 */
-	public function completeRequest(array $parameters = array())
+	public function completeRequest(array $parameters = []): CompleteRequest
 	{
-		return $this->createRequest('\Omnipay\Quickpay\Message\CompleteRequest', $parameters);
+		return $this->createRequest(CompleteRequest::class, $parameters);
 	}
 
 	/**
 	 * Complete capture
 	 *
 	 * @param array $parameters
-	 * @return \Omnipay\Quickpay\Message\CompleteRequest
+	 * @return CompleteRequest
 	 */
-	public function completeCapture(array $parameters = array())
+	public function completeCapture(array $parameters = []): CompleteRequest
 	{
 		return $this->completeRequest($parameters);
 	}
@@ -362,9 +372,9 @@ class Gateway extends AbstractGateway
 	 * Complete cancel
 	 *
 	 * @param array $parameters
-	 * @return \Omnipay\Quickpay\Message\CompleteRequest
+	 * @return CompleteRequest
 	 */
-	public function completeVoid(array $parameters = array())
+	public function completeVoid(array $parameters = []): CompleteRequest
 	{
 		return $this->completeRequest($parameters);
 	}
@@ -373,9 +383,9 @@ class Gateway extends AbstractGateway
 	 * Complete refund
 	 *
 	 * @param array $parameters
-	 * @return \Omnipay\Quickpay\Message\CompleteRequest
+	 * @return CompleteRequest
 	 */
-	public function completeRefund(array $parameters = array())
+	public function completeRefund(array $parameters = []): CompleteRequest
 	{
 		return $this->completeRequest($parameters);
 	}
@@ -384,9 +394,9 @@ class Gateway extends AbstractGateway
 	 * Complete recurring
 	 *
 	 * @param array $parameters
-	 * @return \Omnipay\Quickpay\Message\CompleteRequest
+	 * @return CompleteRequest
 	 */
-	public function completeRecurring(array $parameters = array())
+	public function completeRecurring(array $parameters = []): CompleteRequest
 	{
 		return $this->completeRequest($parameters);
 	}
@@ -394,15 +404,69 @@ class Gateway extends AbstractGateway
 	/**
 	 * @return Notification
 	 */
-	public function acceptNotification()
+	public function acceptNotification(): Notification
 	{
 		return new Notification($this->httpRequest, $this->getPrivatekey());
 	}
 
-	public function link(array $parameters = array())
+	/**
+	 * @return bool
+	 */
+	public function supportsCreateCard(): bool
 	{
-		return $this->createRequest('\Omnipay\Quickpay\Message\LinkRequest', $parameters);
+		return false;
 	}
 
+	public function createCard(array $options = [])
+	{
+		throw new BadMethodCallException('Method createCard() not supported');
+	}
 
+	/**
+	 * @return bool
+	 */
+	public function supportsUpdateCard(): bool
+	{
+		return false;
+	}
+
+	public function updateCard(array $options = [])
+	{
+		throw new BadMethodCallException('Method updateCard() not supported');
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function supportsDeleteCard(): bool
+	{
+		return false;
+	}
+
+	public function deleteCard(array $options = [])
+	{
+		throw new BadMethodCallException('Method deleteCard() not supported');
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function supportsFetchTransaction(): bool
+	{
+		return false;
+	}
+
+	public function fetchTransaction(array $options = [])
+	{
+		throw new BadMethodCallException('Method fetchTransaction() not supported');
+	}
+
+	/**
+	 * @param array $parameters
+	 * @return LinkRequest
+	 */
+	public function link(array $parameters = []): LinkRequest
+	{
+		return $this->createRequest(LinkRequest::class, $parameters);
+	}
 }

@@ -20,11 +20,11 @@ class RecurringRequest extends AbstractRequest
 	/**
 	 * @return array
 	 */
-	public function getData()
+	public function getData(): array
 	{
-		$data = parent::getData();
-		$data['order_id'] = $this->getOrderID();
-		$data['auto_capture'] = 1;
+		$data					= parent::getData();
+		$data['order_id']		= $this->getOrderID();
+		$data['auto_capture']	= 1;
 		return $data;
 	}
 }

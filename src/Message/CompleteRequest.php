@@ -10,38 +10,47 @@ use Omnipay\Common\Exception\InvalidResponseException;
  */
 class CompleteRequest extends AbstractRequest
 {
-    public function getData()
-    {
-        $data = $this->httpRequest->query->all();
+	/**
+	 * @return resource|array
+	 * @throws InvalidResponseException
+	 */
+	public function getData(): array
+	{
+		$data = $this->httpRequest->query->all();
 
-        // if its the notifyUrl (callback) being handled and not returnUrl
-        if ($this->httpRequest->headers->get('Content-Type') == "application/json") {
-            $data = $this->httpRequest->getContent();
+		// if its the notifyUrl (callback) being handled and not returnUrl
+		if ($this->httpRequest->headers->get('Content-Type') === 'application/json')
+		{
+			$data				= $this->httpRequest->getContent();
+			$header_checksum	= $this->httpRequest->headers->get('Quickpay-Checksum-Sha256');
 
-            $header_checksum = $this->httpRequest->headers->get('Quickpay-Checksum-Sha256');
-            // validate with accounts private key.
-            $our_checksum = hash_hmac("sha256", $this->httpRequest->getContent(), $this->getPrivateKey());
-            if ($our_checksum != $header_checksum) {
-                throw new InvalidResponseException;
-            }
-        }
+			// validate with accounts private key.
+			$our_checksum	= hash_hmac('sha256', $this->httpRequest->getContent(), $this->getPrivateKey());
+			if ($our_checksum !== $header_checksum)
+			{
+				throw new InvalidResponseException;
+			}
+		}
 
-        return $data;
-    }
+		return $data;
+	}
 
-    /**
-     * @codeCoverageIgnore
-     */
-    public function sendData($data)
-    {
-        return $this->response = new Response($this, $data);
-    }
+	/**
+	 * @codeCoverageIgnore
+	 * @param $data
+	 * @return Response
+	 */
+	public function sendData($data): Response
+	{
+		return $this->response = new Response($this, $data);
+	}
 
-    /**
-     * @codeCoverageIgnore
-     */
-    public function getHttpMethod()
-    {
-    }
+	/**
+	 * @codeCoverageIgnore
+	 */
+	public function getHttpMethod(): string
+	{
+		return '';
+	}
 }
 

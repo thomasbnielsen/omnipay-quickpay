@@ -1,6 +1,4 @@
 <?php
-
-
 namespace Omnipay\Quickpay\Message;
 
 
@@ -9,61 +7,52 @@ use Omnipay\Common\Message\RequestInterface;
 
 class LinkResponse extends Response implements RedirectResponseInterface
 {
-    protected $reference;
+	protected $reference;
 
-    public function __construct(RequestInterface $request, $data, $reference = null)
-    {
-        parent::__construct($request, $data);
-        $this->reference = $reference;
-    }
+	public function __construct(RequestInterface $request, $data, $reference = null)
+	{
+		parent::__construct($request, $data);
+		$this->reference	= $reference;
+	}
 
-    public function isSuccessful()
-    {
-        $body = $this->getResponseBody();
-        $body = json_decode($body);
-        if (isset($body->url)) {
-            return true;
-        }
-        return false;
-    }
+	/**
+	 * @return bool
+	 */
+	public function isSuccessful(): bool
+	{
+		$body	= json_decode($this->getResponseBody());
+		if(isset($body->url))
+		{
+			return true;
+		}
 
-    public function getTransactionReference()
-    {
-        return $this->reference;
-    }
+		return false;
+	}
 
-    /**
-     * @return bool
-     * @codeCoverageIgnore
-     */
-    public function isRedirect()
-    {
-        return true;
-    }
+	/**
+	 * @return string
+	 */
+	public function getTransactionReference(): string
+	{
+		return $this->reference;
+	}
 
-    public function getRedirectUrl()
-    {
-        $data = json_decode($this->getResponseBody());
-        return $data->url;
-    }
+	/**
+	 * @return bool
+	 * @codeCoverageIgnore
+	 */
+	public function isRedirect(): bool
+	{
+		return true;
+	}
 
-    /**
-     * @return string
-     * @codeCoverageIgnore
-     */
-    public function getRedirectMethod()
-    {
-        return 'GET';
-    }
-
-    /**
-     * @return array
-     * @codeCoverageIgnore
-     */
-    public function getRedirectData()
-    {
-        return [];
-    }
-
+	/**
+	 * @return string
+	 */
+	public function getRedirectUrl(): string
+	{
+		$data	= json_decode($this->getResponseBody());
+		return $data->url;
+	}
 
 }

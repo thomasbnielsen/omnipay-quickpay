@@ -14,11 +14,13 @@ class VoidRequest extends AbstractRequest
 		$this->setApiMethod('cancel');
 	}
 
-	public function getData()
+	/**
+	 * @return array
+	 */
+	public function getData(): array
 	{
-		$data = array(
-			'id' => $this->getTransactionReference()
-		);
-		return $data;
+		return [
+			'id'	=> $this->getTransactionReference()
+		];
 	}
 }

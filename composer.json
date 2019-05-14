@@ -1,5 +1,5 @@
 {
-	"name": "nobrainerweb/omnipay-quickpay",
+	"name": "qobo/omnipay-quickpay",
 	"type": "library",
 	"description": "Quickpay driver for the Omnipay payment library",
 	"keywords": [

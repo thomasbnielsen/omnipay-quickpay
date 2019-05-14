@@ -11,7 +11,7 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     /**
      * @var string
      */
-    protected $endpoint = 'https://api.quickpay.net/';
+    protected $endpoint = 'https://api.link4pay.com';
 
     /**
      * @var string

@@ -82,7 +82,7 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 				'Content-Type' => 'application/json',
 				'QuickPay-Callback-Url' => $this->getNotifyUrl()
 			],
-            $data
+            json_encode($data)
         );
 
         return $this->response = new Response($this, $httpResponse->getBody()->getContents());

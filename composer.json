@@ -23,7 +23,7 @@
 	},
 	"minimum-stability": "dev",
 	"require": {
-		"omnipay/common": "^3@beta"
+		"league/omnipay": "^3.0"
 	},
     "require-dev": {
         "omnipay/tests": "^3"

@@ -3,6 +3,8 @@ An Omnipay driver for the Quickpay payment processor.
 
 [QuickPay](https://quickpay.net/) is a Payment Service Provider that accept all common payment methods - credit cards, bank transfers, invoices, and more.
 
+This package supports omnipay 3.x. For omnipay 2.x, see branch 1.0.
+
 ### Why Omnipay
 The Omnipay php library is an easy to use, consistent payment processing library for PHP 5.3+
 >Because you can learn one API and use it in multiple projects using different payment gateways

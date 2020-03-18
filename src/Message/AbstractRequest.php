@@ -19,12 +19,18 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     private $apimethod = 'capture';
 
     /**
+     * @var string
+     */
+    private $httpMethod = 'POST';
+
+    /**
      * @return string
      */
     public function getUrl()
     {
         $url = $this->getEndPoint() . $this->getTypeOfRequest() . '/' . $this->getTransactionReference(
-            ) . '/' . $this->getApiMethod();
+            );
+        if ($this->getApiMethod() != '') $url .= '/' . $this->getApiMethod();
         if ($this->getSynchronized()) {
             $url .= '?synchronized';
             return $url;
@@ -49,7 +55,15 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
      */
     public function getHttpMethod()
     {
-        return 'POST';
+        return $this->httpMethod;
+    }
+
+    /**
+     * @return string
+     */
+    public function setHttpMethod($method)
+    {
+        $this->httpMethod = $method;
     }
 
     /**
@@ -335,4 +349,22 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     {
         return $this->setParameter('order_id', $value);
     }
+
+    /**
+     * @param $value
+     * @return self
+     */
+    public function setAutoCapture($value)
+    { 
+        return $this->setParameter('auto_capture', $value);
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getAutoCapture()
+    {
+        return boolval($this->getParameter('auto_capture'));
+    }
+
 }

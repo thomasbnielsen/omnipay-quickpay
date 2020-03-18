@@ -10,6 +10,13 @@ use Omnipay\Common\Exception\InvalidResponseException;
  */
 class CompleteRequest extends AbstractRequest
 {
+    public function __construct($httpClient, $httpRequest)
+    {
+        parent::__construct($httpClient, $httpRequest);
+        $this->setApiMethod('');
+        $this->setHttpMethod('GET');
+    }
+
     public function getData()
     {
         $data = $this->httpRequest->query->all();
@@ -34,7 +41,14 @@ class CompleteRequest extends AbstractRequest
      */
     public function sendData($data)
     {
-        return $this->response = new Response($this, $data);
+        $httpResponse =  $this->httpClient->request('get', $this->getEndPoint() . '/payments/' . $this->getTransactionReference(),
+            [
+                'Authorization' => 'Basic ' . base64_encode(":" . $this->getApikey()),
+                'Accept-Version' => 'v10',
+                'Content-Type' => 'application/json',
+            ]
+        );
+        return $this->response = new Response($this, $httpResponse->getBody()->getContents());
     }
 
     /**

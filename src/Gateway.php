@@ -38,7 +38,8 @@ class Gateway extends AbstractGateway
 			'description'                  => '',
 			'order_id'                     => '',
 			'synchronized'                 => false,
-			'payment_methods'              => array()
+			'payment_methods'              => array(),
+			'auto_capture'				   => false,
 		);
 	}
 
@@ -246,6 +247,24 @@ class Gateway extends AbstractGateway
 		return boolval($this->getParameter('synchronized'));
 	}
 
+
+	/**
+	 * @param $value
+	 * @return self
+	 */
+	public function setAutoCapture($value)
+	{ 
+		return $this->setParameter('auto_capture', $value);
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getAutoCapture()
+	{
+		return boolval($this->getParameter('auto_capture'));
+	}
+	
 	/**
 	 * Start an authorize request
 	 *
@@ -405,6 +424,10 @@ class Gateway extends AbstractGateway
 		return $this->createRequest('\Omnipay\Quickpay\Message\LinkRequest', $parameters);
 	}
 
+	public function status(array $parameters = array())
+	{
+		return $this->createRequest('\Omnipay\Quickpay\Message\StatusRequest', $parameters);
+	}
 
 	function __call($name, $arguments)
 	{

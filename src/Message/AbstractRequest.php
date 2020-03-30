@@ -335,4 +335,38 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     {
         return $this->setParameter('order_id', $value);
     }
+
+    /**
+	 * @return array
+	 */
+	public function getBasket()
+	{
+		return $this->getParameter('basket');
+	}
+
+	/**
+	 * @param array $value
+	 * @return self
+	 */
+	public function setBasket($value = array())
+	{
+		return $this->setParameter('basket', $value);
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getInvoiceAddress()
+	{
+		return $this->getParameter('invoice_address');
+	}
+
+	/**
+	 * @param array $value
+	 * @return self
+	 */
+	public function setInvoiceAddress($value = array())
+	{
+		return $this->setParameter('invoice_address', $value);
+	}
 }

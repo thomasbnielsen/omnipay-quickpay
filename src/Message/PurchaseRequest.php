@@ -38,13 +38,18 @@ class PurchaseRequest extends AbstractRequest
             "payment_methods"              => $this->getPaymentMethods()
         );
 
+        // we have to flatten these arrays to fullfill html names, for form input fields.. (omnipay posts a form)
         if(!empty($this->getInvoiceAddress())){
-            $params['invoice_address'] = $this->getInvoiceAddress();
+            foreach($this->htmlFormNamesFromArray($this->getInvoiceAddress(), 'invoice_address') as $key => $val){
+                $params[$key] = $val;
+            }
         }
 
         if(!empty($this->getBasket())){
-            $params['basket'] = $this->getBasket();
-        }
+            foreach($this->htmlFormNamesFromArray($this->getBasket(), 'basket') as $key => $val){
+                $params[$key] = $val;
+            }
+        }   
 
         // it seems description param is not always allowed, depending on the Type set
         if ($this->getDescription() != '') {
@@ -52,6 +57,34 @@ class PurchaseRequest extends AbstractRequest
         }
 
         return $params;
+    }
+
+    /**
+     * Takes an associative or multi dim array like ['street' => 'value', 'city => 'value] and a prefix such as "invoice_address"
+     * It then returns a array with values like 
+     * ['invoice_address[street]' => 'value', 'invoice_address[city]' => 'value']
+     * This is to fullfil the omnipay requirements, when it turns the params into html input fields
+     * 
+     * 
+     * @param array $array
+     * @param string $prefix
+     * @return array
+     */
+    protected function htmlFormNamesFromArray($array, $prefix)
+    {
+        $flattened = [];
+        foreach($array as $key => $val){
+            if(is_array($val)){
+                $deeperPrefix = $prefix . '[' . $key . ']';
+                foreach($this->htmlFormNamesFromArray($val, $deeperPrefix) as $paramName => $paramValue){
+                    $flattened[$paramName] = $paramValue;
+                }
+            } else {
+                $flattened[$prefix . '[' . $key . ']'] = $val;   
+            }
+        }
+
+        return $flattened;
     }
 
     public function setTransactionId($value)
@@ -71,7 +104,9 @@ class PurchaseRequest extends AbstractRequest
         // checks if any of these are empty, so we can throw an error without calling the API
         $this->validate('merchant', 'agreement', 'amount', 'transactionId');
 
-        return $this->createChecksum($this->getQuickpayParams());
+        $data = $this->createChecksum($this->getQuickpayParams());
+
+        return $data;
     }
 
     /**

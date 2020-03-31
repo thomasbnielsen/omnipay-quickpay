@@ -37,18 +37,7 @@ class Gateway extends AbstractGateway
 			'description'                  => '',
 			'order_id'                     => '',
 			'synchronized'                 => false,
-			'payment_methods'              => array(),
-			'invoice_address' => array(
-				'name' => '',
-				'street' => '',
-				'city' => '',
-				'zip_code' => '',
-				'region' => '',
-				'country_code' => '',
-				'phone_number' => '',
-				'email' => '',
-			),
-			'basket' => array()
+			'payment_methods'              => ''
 		);
 	}
 

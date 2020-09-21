@@ -367,4 +367,21 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         return boolval($this->getParameter('auto_capture'));
     }
 
+
+    /**
+     * @return array
+     */
+    public function getVariables()
+    {
+        return $this->getParameter('variables');
+    }
+
+    /**
+     * @param array $value
+     * @return mixed
+     */
+    public function setVariables($value = array())
+    {
+        return $this->setParameter('variables', $value);
+    }
 }

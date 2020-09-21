@@ -34,9 +34,8 @@ class LinkRequest extends AbstractRequest
             'google_analytics_tracking_id' => $this->getGoogleAnalyticsTrackingID(),
             'google_analytics_client_id'   => $this->getGoogleAnalyticsClientID(),
             'auto_capture'                 => $this->getAutoCapture(),
-            'payment_methods'              => $this->getPaymentMethods()
+            'payment_methods'              => $this->getPaymentMethods(),
         );
-
 
         return $params;
     }
@@ -56,12 +55,16 @@ class LinkRequest extends AbstractRequest
 
         if (!$reference) {
             $url  = $this->getEndPoint() . '/' . $this->getTypeOfRequest() . '/';
+            $variables = $this->getVariables();
             $data = [
                 'order_id' => $fullData['order_id'],
                 'currency' => $fullData['currency'],
             ];
+            if (count($variables) > 0) {
+                $data['variables'] = $variables;
+            }
 
-            $httpResponse = $this->httpClient->request('POST', $url, [
+           $httpResponse = $this->httpClient->request('POST', $url, [
 				'Authorization' => 'Basic ' . base64_encode(":" . $this->getApikey()),
 				'Accept-Version' => 'v10',
 				'Content-Type' => 'application/json',

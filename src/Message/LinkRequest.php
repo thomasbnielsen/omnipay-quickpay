@@ -34,7 +34,7 @@ class LinkRequest extends AbstractRequest
             'google_analytics_tracking_id' => $this->getGoogleAnalyticsTrackingID(),
             'google_analytics_client_id'   => $this->getGoogleAnalyticsClientID(),
             'auto_capture'                 => $this->getAutoCapture(),
-            'payment_methods'              => $this->getPaymentMethods(),
+            'payment_methods'              => $this->getPaymentMethods()
         );
 
         return $params;

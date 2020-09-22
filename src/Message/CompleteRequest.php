@@ -45,7 +45,7 @@ class CompleteRequest extends AbstractRequest
             [
                 'Authorization' => 'Basic ' . base64_encode(":" . $this->getApikey()),
                 'Accept-Version' => 'v10',
-                'Content-Type' => 'application/json',
+                'Content-Type' => 'application/json'
             ]
         );
         return $this->response = new Response($this, $httpResponse->getBody()->getContents());

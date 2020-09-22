@@ -2,7 +2,7 @@
 
 namespace Omnipay\Quickpay\Message;
 
-class NotifyResponse extends Response
+class CaptureResponse extends Response
 {
 	// return the response body for the app to use
 	public function isSuccessful()

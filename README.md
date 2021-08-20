@@ -34,6 +34,7 @@ Read more about Omnipay here: https://github.com/thephpleague/omnipay
 * order_id
 * payment_methods
 * synchronized (bool)
+* deadline
 
 ### Development
 This module was coded by [Nobrainer Web](http://www.nobrainer.dk), with support from [QuickPay](https://quickpay.net/)

@@ -234,6 +234,23 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     }
 
     /**
+     * @return int
+     */
+    public function getDeadline()
+    {
+        return $this->getParameter('deadline');
+    }
+
+    /**
+     * @param $value
+     * @return int
+     */
+    public function setDeadline($value)
+    {
+        return $this->setParameter('deadline', $value);
+    }
+
+    /**
      * @return array
      */
     public function getPaymentMethods()

@@ -425,6 +425,15 @@ class Gateway extends AbstractGateway
 		return $this->createRequest('\Omnipay\Quickpay\Message\LinkRequest', $parameters);
 	}
 
+	/**
+	 * @param array $parameters
+	 * @return \Omnipay\Quickpay\Message\DeleteRequest
+	 */
+	public function delete(array $parameters = array())
+	{
+		return $this->createRequest('\Omnipay\Quickpay\Message\DeleteRequest', $parameters);
+	}
+
 	public function status(array $parameters = array())
 	{
 		return $this->createRequest('\Omnipay\Quickpay\Message\StatusRequest', $parameters);

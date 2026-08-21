@@ -73,6 +73,13 @@ class LinkRequest extends AbstractRequest
 
         if (!$reference) {
             $url  = rtrim($this->getEndPoint(), '/') . '/' . $this->getTypeOfRequest() . '/';
+            // Omnipay\Common\AbstractGateway::initialize() collapses an
+            // empty-array default parameter (Gateway::getDefaultParameters()
+            // has 'variables' => array()) to boolean false via reset() — a
+            // documented quirk of that base class, not something to patch
+            // there. count() on that is a fatal TypeError in PHP 8+; !empty()
+            // treats false/[] the same way payment_methods already does
+            // above, so this can't crash just because no caller ever set it.
             $variables = $this->getVariables();
             $data = [
                 'order_id' => $fullData['order_id'],
@@ -82,7 +89,7 @@ class LinkRequest extends AbstractRequest
                 // needed it.
                 'description' => $fullData['description'],
             ];
-            if (count($variables) > 0) {
+            if (!empty($variables)) {
                 $data['variables'] = $variables;
             }
 

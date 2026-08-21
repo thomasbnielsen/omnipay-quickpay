@@ -13,9 +13,11 @@ class Response extends AbstractResponse
 	{
 		if ($this->getResponseBody()){
 			$response_body = json_decode($this->getResponseBody());
-			$data = end($response_body->operations);
-			if ($response_body->accepted && $data->qp_status_code=="20000") {
-				return true;
+			if ($response_body && !empty($response_body->operations)) {
+				$data = end($response_body->operations);
+				if (!empty($response_body->accepted) && isset($data->qp_status_code) && $data->qp_status_code=="20000") {
+					return true;
+				}
 			}
 		}
 
@@ -43,7 +45,7 @@ class Response extends AbstractResponse
 		if ($this->getResponseBody()){
 			$response_body = json_decode($this->getResponseBody());
 		}
-		return isset($response_body->id) ? $response_body->id : '';
+		return isset($response_body->id) ? (string) $response_body->id : '';
 	}
 
 	/**
@@ -52,8 +54,15 @@ class Response extends AbstractResponse
 	public function getCode(){
 		if ($this->getResponseBody()){
 			$response_body = json_decode($this->getResponseBody());
-			$data = end($response_body->operations);
-			return isset($data->qp_status_code) ? $data->qp_status_code : '';
+			if ($response_body && !empty($response_body->operations)) {
+				$data = end($response_body->operations);
+				if (isset($data->qp_status_code)) {
+					return (string) $data->qp_status_code;
+				}
+			}
+			// Error-shaped Quickpay response (auth/validation failure) has no
+			// "operations" array at all — just a top-level error code/message.
+			return isset($response_body->error) ? (string) $response_body->error : '';
 		}
 		return null;
 	}
@@ -64,8 +73,19 @@ class Response extends AbstractResponse
 	public function getMessage(){
 		if ($this->getResponseBody()){
 			$response_body = json_decode($this->getResponseBody());
-			$data = end($response_body->operations);
-			return isset($data->qp_status_msg) ? $data->type . ': ' . $data->qp_status_msg : '';
+			if ($response_body && !empty($response_body->operations)) {
+				$data = end($response_body->operations);
+				if (isset($data->qp_status_msg)) {
+					return $data->type . ': ' . $data->qp_status_msg;
+				}
+			}
+			// Error-shaped Quickpay response (auth/validation failure) has no
+			// "operations" array — the real reason is in "message"/"errors".
+			if ($response_body && isset($response_body->message)) {
+				$errors = isset($response_body->errors) ? ' ' . json_encode($response_body->errors) : '';
+				return $response_body->message . $errors;
+			}
+			return '';
 		}
 		return null;
 	}

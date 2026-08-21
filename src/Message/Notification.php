@@ -68,7 +68,9 @@ class Notification implements NotificationInterface
     public function getTransactionReference()
     {
         if ($data = $this->getData()) {
-            return $data->id;
+            // Quickpay returns id as a JSON number — cast to string, same
+            // fix as Response::getTransactionReference() and LinkRequest.
+            return (string) $data->id;
         }
     }
 

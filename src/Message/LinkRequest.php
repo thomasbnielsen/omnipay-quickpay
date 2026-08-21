@@ -25,6 +25,7 @@ class LinkRequest extends AbstractRequest
             'version'                      => 'v10',
             'agreement_id'                 => $this->getAgreement(),
             'order_id'                     => $this->getTransactionId(),
+            'description'                  => $this->getDescription(),
             'amount'                       => $this->getAmountInteger(),
             'currency'                     => $this->getCurrency(),
             'continue_url'                 => $this->getReturnUrl(),
@@ -34,8 +35,25 @@ class LinkRequest extends AbstractRequest
             'google_analytics_tracking_id' => $this->getGoogleAnalyticsTrackingID(),
             'google_analytics_client_id'   => $this->getGoogleAnalyticsClientID(),
             'auto_capture'                 => $this->getAutoCapture(),
-            'payment_methods'              => $this->getPaymentMethods()
         );
+
+        // Unlike POST /payments (PurchaseRequest, which sends this
+        // unconditionally and works fine either way), PUT /subscriptions/
+        // {id}/link treats an empty payment_methods list as "no payment
+        // method is allowed for this transaction" rather than "no
+        // restriction" — surfaces on the hosted page itself as "No available
+        // payment-method for transaction", not as an API-level error. Only
+        // send it when the caller actually wants to restrict methods.
+        if (!empty($this->getPaymentMethods())) {
+            $params['payment_methods'] = $this->getPaymentMethods();
+        }
+
+        // Controls the hosted link page's own timeout (default 15 minutes)
+        // — lets it be tied to whatever local deadline the caller is already
+        // enforcing (e.g. an expiring booking), same as PurchaseRequest.
+        if ($this->getDeadline() != '') {
+            $params['deadline'] = $this->getDeadline();
+        }
 
         return $params;
     }
@@ -54,11 +72,15 @@ class LinkRequest extends AbstractRequest
         $reference = $this->getTransactionReference();
 
         if (!$reference) {
-            $url  = $this->getEndPoint() . '/' . $this->getTypeOfRequest() . '/';
+            $url  = rtrim($this->getEndPoint(), '/') . '/' . $this->getTypeOfRequest() . '/';
             $variables = $this->getVariables();
             $data = [
                 'order_id' => $fullData['order_id'],
                 'currency' => $fullData['currency'],
+                // Required by POST /subscriptions — not documented as such
+                // on POST /payments, which is why PurchaseRequest never
+                // needed it.
+                'description' => $fullData['description'],
             ];
             if (count($variables) > 0) {
                 $data['variables'] = $variables;
@@ -74,15 +96,20 @@ class LinkRequest extends AbstractRequest
             $body     = $httpResponse->getBody()->getContents();
             $response = json_decode($body, true);
             if (array_key_exists('id', $response)) {
-                $reference = $response['id'];
+                // Quickpay returns id as a JSON number — cast to string, or
+                // SilverStripe 6's StringFieldValidator rejects it the
+                // moment a caller writes it to a Varchar TransactionReference
+                // (same class of bug as Response::getTransactionReference()).
+                $reference = (string) $response['id'];
             } else {
                 return new LinkResponse($this, $body);
             }
         }
         unset($fullData['order_id']);
         unset($fullData['currency']);
+        unset($fullData['description']);
 
-        $url = $this->getEndPoint() . '/' . $this->getTypeOfRequest() . '/' . $reference . '/link';
+        $url = rtrim($this->getEndPoint(), '/') . '/' . $this->getTypeOfRequest() . '/' . $reference . '/link';
 
         $httpResponse = $this->httpClient->request('PUT', $url, [
 			'Authorization' => 'Basic ' . base64_encode(":" . $this->getApikey()),

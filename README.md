@@ -34,6 +34,7 @@ Read more about Omnipay here: https://github.com/thephpleague/omnipay
 * order_id
 * payment_methods
 * synchronized (bool)
+* deadline
 
 ### Please note
 If you need to do instant capture or auto_capture / [autocapture]([https://quickpay.net/](https://quickpay.net/dk/helpdesk/capture/#autocapture)) you should set the flag use_authorize: false. This will do a instant capture.

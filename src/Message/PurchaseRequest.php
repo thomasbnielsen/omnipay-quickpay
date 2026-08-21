@@ -2,6 +2,7 @@
 
 namespace Omnipay\Quickpay\Message;
 
+use Cart\Cart;
 use Omnipay\Common\Exception\InvalidRequestException;
 
 
@@ -41,6 +42,11 @@ class PurchaseRequest extends AbstractRequest
         // it seems description param is not always allowed, depending on the Type set
         if ($this->getDescription() != '') {
             $params['description'] = $this->getDescription();
+        }
+
+        // show expiry timer on Quicpay payment screen
+        if ($this->getDeadline() != '') {
+            $params['deadline'] = $this->getDeadline();
         }
 
         return $params;

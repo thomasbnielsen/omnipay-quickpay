@@ -10,7 +10,7 @@ class AuthorizeRequestTest extends TestCase
     /** @var  AuthorizeRequest */
     protected $request;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->request = new AuthorizeRequest($this->getHttpClient(), $this->getHttpRequest());

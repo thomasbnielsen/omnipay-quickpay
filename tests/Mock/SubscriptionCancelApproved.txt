@@ -1,0 +1,4 @@
+HTTP/1.1 202 Accepted
+Content-Type: application/json; charset=utf-8
+
+{"id":600001,"order_id":"S300","accepted":true,"type":"Subscription","state":"cancelled","operations":[{"type":"authorize","pending":false,"qp_status_code":"20000","qp_status_msg":"Approved"},{"type":"cancel","pending":false,"qp_status_code":"20000","qp_status_msg":"Approved"}]}

@@ -10,7 +10,7 @@ class LinkRequestTest extends TestCase
     /** @var  LinkRequest */
     protected $request;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->request = new LinkRequest($this->getHttpClient(), $this->getHttpRequest());

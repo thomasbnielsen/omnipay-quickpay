@@ -1,0 +1,4 @@
+HTTP/1.1 202 Accepted
+Content-Type: application/json; charset=utf-8
+
+{"id":800001,"order_id":"T200","accepted":true,"type":"Payment","state":"processed","operations":[{"type":"authorize","pending":false,"qp_status_code":"20000","qp_status_msg":"Approved"},{"type":"capture","pending":false,"qp_status_code":"20000","qp_status_msg":"Approved"},{"type":"refund","amount":10000,"pending":true,"qp_status_code":null,"qp_status_msg":null}]}

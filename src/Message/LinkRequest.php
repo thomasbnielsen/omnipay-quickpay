@@ -34,7 +34,7 @@ class LinkRequest extends AbstractRequest
             'language'                     => $this->getLanguage(),
             'google_analytics_tracking_id' => $this->getGoogleAnalyticsTrackingID(),
             'google_analytics_client_id'   => $this->getGoogleAnalyticsClientID(),
-            'auto_capture'                 => $this->getAutoCapture(),
+            'auto_capture'                 => (bool) $this->getAutoCapture(),
         );
 
         // Unlike POST /payments (PurchaseRequest, which sends this
@@ -72,59 +72,38 @@ class LinkRequest extends AbstractRequest
         $reference = $this->getTransactionReference();
 
         if (!$reference) {
-            $url  = rtrim($this->getEndPoint(), '/') . '/' . $this->getTypeOfRequest() . '/';
-            // Omnipay\Common\AbstractGateway::initialize() collapses an
-            // empty-array default parameter (Gateway::getDefaultParameters()
-            // has 'variables' => array()) to boolean false via reset() — a
-            // documented quirk of that base class, not something to patch
-            // there. count() on that is a fatal TypeError in PHP 8+; !empty()
-            // treats false/[] the same way payment_methods already does
-            // above, so this can't crash just because no caller ever set it.
+            // Omnipay's AbstractGateway::initialize() turns empty-array defaults into false.
             $variables = $this->getVariables();
             $data = [
                 'order_id' => $fullData['order_id'],
                 'currency' => $fullData['currency'],
-                // Required by POST /subscriptions — not documented as such
-                // on POST /payments, which is why PurchaseRequest never
-                // needed it.
-                'description' => $fullData['description'],
             ];
+            // POST /subscriptions requires a description; POST /payments accepts one.
+            if (!empty($fullData['description'])) {
+                $data['description'] = $fullData['description'];
+            }
             if (!empty($variables)) {
                 $data['variables'] = $variables;
             }
 
-           $httpResponse = $this->httpClient->request('POST', $url, [
-				'Authorization' => 'Basic ' . base64_encode(":" . $this->getApikey()),
-				'Accept-Version' => 'v10',
-				'Content-Type' => 'application/json',
-				'QuickPay-Callback-Url' => $this->getNotifyUrl()
-			], json_encode($data));
-
-            $body     = $httpResponse->getBody()->getContents();
-            $response = json_decode($body, true);
-            if (array_key_exists('id', $response)) {
-                // Quickpay returns id as a JSON number — cast to string, or
-                // SilverStripe 6's StringFieldValidator rejects it the
-                // moment a caller writes it to a Varchar TransactionReference
-                // (same class of bug as Response::getTransactionReference()).
-                $reference = (string) $response['id'];
-            } else {
-                return new LinkResponse($this, $body);
+            [$status, $body] = $this->sendRequest('POST', $this->buildUrl([$this->getTypeOfRequest()], false), $data);
+            $created = json_decode($body, true);
+            if (!is_array($created) || !isset($created['id'])) {
+                return $this->response = new LinkResponse($this, $body, null, $status);
             }
+            $reference = (string) $created['id'];
         }
-        unset($fullData['order_id']);
-        unset($fullData['currency']);
-        unset($fullData['description']);
 
-        $url = rtrim($this->getEndPoint(), '/') . '/' . $this->getTypeOfRequest() . '/' . $reference . '/link';
+        unset($fullData['order_id'], $fullData['currency'], $fullData['description']);
 
-        $httpResponse = $this->httpClient->request('PUT', $url, [
-			'Authorization' => 'Basic ' . base64_encode(":" . $this->getApikey()),
-			'Accept-Version' => 'v10',
-			'Content-Type' => 'application/json',
-			'QuickPay-Callback-Url' => $this->getNotifyUrl()
-		], json_encode($fullData));
+        [$status, $body] = $this->sendRequest(
+            'PUT',
+            $this->buildUrl([$this->getTypeOfRequest(), $reference, 'link'], false),
+            array_filter($fullData, function ($value) {
+                return $value !== null && $value !== '';
+            })
+        );
 
-        return new LinkResponse($this, $httpResponse->getBody()->getContents(), $reference);
+        return $this->response = new LinkResponse($this, $body, $reference, $status);
     }
 }

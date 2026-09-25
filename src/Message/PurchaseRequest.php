@@ -36,8 +36,12 @@ class PurchaseRequest extends AbstractRequest
             "google_analytics_tracking_id" => $this->getGoogleAnalyticsTrackingID(),
             "autocapture"                  => 1,
             "type"                         => $this->getType(),
-            "payment_methods"              => $this->getPaymentMethods()
         );
+
+        // An empty list means "no restriction"; only send it when methods are restricted.
+        if (!empty($this->getPaymentMethods())) {
+            $params['payment_methods'] = $this->getPaymentMethods();
+        }
 
         // it seems description param is not always allowed, depending on the Type set
         if ($this->getDescription() != '') {
@@ -138,6 +142,7 @@ class PurchaseRequest extends AbstractRequest
      */
     public function getHttpMethod()
     {
+        return 'POST';
     }
 
 }

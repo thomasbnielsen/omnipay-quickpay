@@ -3,11 +3,14 @@
 namespace Omnipay\Quickpay\Message;
 
 /**
- * Quickpay Abstract Request
+ * Base class for requests against the Quickpay v10 REST API.
+ *
+ * Routing: `type` = "subscription" targets /subscriptions, anything else /payments.
+ * `synchronized` appends ?synchronized so Quickpay answers with the final result
+ * instead of a pending 202.
  */
 abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 {
-
     /**
      * @var string
      */
@@ -16,7 +19,7 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     /**
      * @var string
      */
-    private $apimethod = 'capture';
+    private $apimethod = '';
 
     /**
      * @var string
@@ -24,29 +27,57 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     private $httpMethod = 'POST';
 
     /**
-     * @return string
+     * Response class used by sendData()
+     *
+     * @var string
      */
-    public function getUrl()
+    protected $responseClass = Response::class;
+
+    /**
+     * Builds an API URL from path segments, without double slashes.
+     */
+    protected function buildUrl(array $segments, bool $allowSynchronized = true): string
     {
-        $url = $this->getEndPoint() . $this->getTypeOfRequest() . '/' . $this->getTransactionReference(
-            );
-        if ($this->getApiMethod() != '') $url .= '/' . $this->getApiMethod();
-        if ($this->getSynchronized()) {
-            $url .= '?synchronized';
-            return $url;
+        $parts = [];
+        foreach ($segments as $segment) {
+            $segment = trim((string) $segment, '/');
+            if ($segment !== '') {
+                $parts[] = rawurlencode($segment);
+            }
         }
+
+        $url = rtrim($this->getEndPoint(), '/') . '/' . implode('/', $parts);
+
+        if ($allowSynchronized && $this->getSynchronized()) { // any truthy value
+            $url .= '?synchronized';
+        }
+
         return $url;
     }
 
     /**
+     * @return string
+     */
+    public function getUrl()
+    {
+        return $this->buildUrl([
+            $this->getTypeOfRequest(),
+            $this->getTransactionReference(),
+            $this->getApiMethod(),
+        ]);
+    }
+
+    /**
+     * Operation body. Payload fields go in the JSON body, never in headers.
+     *
      * @return array
      */
     public function getData()
     {
-        $data = array(
-            'id'     => $this->getTransactionReference(),
-            'amount' => $this->getAmountInteger()
-        );
+        $data = [];
+        if ($this->getAmount() !== null) {
+            $data['amount'] = $this->getAmountInteger();
+        }
         return $data;
     }
 
@@ -59,47 +90,53 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     }
 
     /**
-     * @return string
+     * @param string $method
+     * @return $this
      */
     public function setHttpMethod($method)
     {
         $this->httpMethod = $method;
+        return $this;
     }
 
     /**
-     * @param $data
-     * @return mixed
+     * Sends a request to the Quickpay API.
+     *
+     * @return array{0: int, 1: string} HTTP status code and raw body
+     */
+    protected function sendRequest(string $method, string $url, ?array $body = null): array
+    {
+        $headers = [
+            'Authorization' => 'Basic ' . base64_encode(':' . $this->getApikey()),
+            'Accept-Version' => 'v10',
+            'Accept' => 'application/json',
+        ];
+        if ($body !== null) {
+            $headers['Content-Type'] = 'application/json';
+        }
+        if ($this->getNotifyUrl()) {
+            $headers['QuickPay-Callback-Url'] = $this->getNotifyUrl();
+        }
+
+        $httpResponse = $this->httpClient->request(
+            $method,
+            $url,
+            $headers,
+            $body !== null ? json_encode((object) $body) : null
+        );
+
+        return [$httpResponse->getStatusCode(), (string) $httpResponse->getBody()];
+    }
+
+    /**
+     * @param mixed $data
+     * @return Response
      */
     public function sendData($data)
     {
-        // TODO this seems to break api actions... what to do
-        // prevent throwing exceptions for 4xx errors
-        //$this->httpClient->getEventDispatcher()->addListener(
-        //	'request.error',
-        //	function ($event) {
-        //		if ($event['response']->isClientError()) {
-        //			$event->stopPropagation();
-        //		}
-        //	}
-        //);
-
-        $url = $this->getUrl();
-        if (is_array($data) && array_key_exists('synchronized', $data)) {
-            unset($data['synchronized']);
-        }
-		$httpResponse = $this->httpClient->request(
-            $this->getHttpMethod(),
-            $url,
-            [
-				'Authorization' => 'Basic ' . base64_encode(":" . $this->getApikey()),
-				'Accept-Version' => 'v10',
-				'Content-Type' => 'application/json',
-				'QuickPay-Callback-Url' => $this->getNotifyUrl()
-			],
-            json_encode($data)
-        );
-
-        return $this->response = new Response($this, $httpResponse->getBody()->getContents());
+        [$status, $body] = $this->sendRequest($this->getHttpMethod(), $this->getUrl(), is_array($data) ? $data : null);
+        $class = $this->responseClass;
+        return $this->response = new $class($this, $body, $status);
     }
 
     /**
@@ -112,11 +149,7 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 
     public function getTypeOfRequest()
     {
-        $type = 'payments';
-        if ($this->getType() == 'subscription') {
-            $type = 'subscriptions';
-        }
-        return $type;
+        return $this->getType() == 'subscription' ? 'subscriptions' : 'payments';
     }
 
     /**
@@ -143,6 +176,12 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     public function getEndPoint()
     {
         return $this->endpoint;
+    }
+
+    public function getTransactionReference()
+    {
+        $reference = parent::getTransactionReference();
+        return ($reference === null || $reference === '') ? $reference : (string) $reference;
     }
 
     /**
@@ -227,7 +266,7 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
      */
     public function getSynchronized()
     {
-        return boolval($this->getParameter('synchronized'));
+        return $this->getParameter('synchronized');
     }
 
     /**
@@ -372,18 +411,19 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
      * @return self
      */
     public function setAutoCapture($value)
-    { 
+    {
         return $this->setParameter('auto_capture', $value);
     }
 
     /**
-     * @return boolean
+     * Null when not set, so each request can apply its own default.
+     *
+     * @return bool|null
      */
     public function getAutoCapture()
     {
-        return boolval($this->getParameter('auto_capture'));
+        return $this->getParameter('auto_capture');
     }
-
 
     /**
      * @return array

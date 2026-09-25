@@ -1,31 +1,43 @@
 {
-	"name": "nobrainerweb/omnipay-quickpay",
-	"type": "library",
-	"description": "Quickpay driver for the Omnipay payment library",
-	"keywords": [
-		"gateway",
-		"merchant",
-		"omnipay",
-		"pay",
-		"payment",
-		"quickpay"
-	],
-	"homepage": "https://github.com/NobrainerWeb/omnipay-quickpay",
-	"license": "MIT",
-	"authors": [
-		{
-			"name": "Sander Hagenaars",
-			"email": "sander@nobrainer.dk"
-		}
-	],
-	"autoload": {
-		"psr-4": { "Omnipay\\Quickpay\\" : "src/" }
-	},
-	"minimum-stability": "dev",
-	"require": {
-		"league/omnipay": "^3.0"
-	},
-	"require-dev": {
-		"omnipay/tests": "^3.1@dev"
-	}
+    "name": "nobrainerweb/omnipay-quickpay",
+    "type": "library",
+    "description": "Quickpay driver for the Omnipay payment library",
+    "keywords": [
+        "gateway",
+        "merchant",
+        "omnipay",
+        "pay",
+        "payment",
+        "quickpay"
+    ],
+    "homepage": "https://github.com/NobrainerWeb/omnipay-quickpay",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sander Hagenaars",
+            "email": "sander@nobrainer.dk"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Omnipay\\Quickpay\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=8.1",
+        "league/omnipay": "^3.0"
+    },
+    "require-dev": {
+        "omnipay/tests": "^4.1"
+    },
+    "scripts": {
+        "test": "phpunit"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "5.0.x-dev",
+            "dev-feature/v5-generic": "5.0.x-dev"
+        }
+    },
+    "minimum-stability": "stable"
 }

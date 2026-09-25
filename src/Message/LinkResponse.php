@@ -1,73 +1,63 @@
 <?php
 
-
 namespace Omnipay\Quickpay\Message;
-
 
 use Omnipay\Common\Message\RedirectResponseInterface;
 use Omnipay\Common\Message\RequestInterface;
 
+/**
+ * Hosted payment link. Successful (and a redirect) when Quickpay returned a URL.
+ * getTransactionReference() is the payment/subscription id the link belongs to,
+ * also when creating the link itself failed.
+ */
 class LinkResponse extends Response implements RedirectResponseInterface
 {
-    protected $reference;
-
-    public function __construct(RequestInterface $request, $data, $reference = null)
+    public function __construct(RequestInterface $request, $data, $reference = null, ?int $httpStatus = null)
     {
-        parent::__construct($request, $data);
-        $this->reference = $reference;
+        parent::__construct($request, $data, $httpStatus, $reference === null ? null : (string) $reference);
     }
 
     public function isSuccessful()
     {
-		$data = json_decode($this->getResponseBody());
-        if (isset($data->url)) {
-            return true;
-        }
+        $resource = $this->getResource();
+        return $this->isHttpOk() && $resource && !empty($resource->url);
+    }
+
+    public function isPending()
+    {
         return false;
     }
 
+    /**
+     * @return string|null
+     */
     public function getError()
-	{
-		$data = json_decode($this->getResponseBody());
-		if (isset($data->error)) {
-			return $data->error;
-		}
-		return null;
-	}
+    {
+        $resource = $this->getResource();
+        return isset($resource->error) ? (string) $resource->error : null;
+    }
 
-	public function getTransactionReference()
+    public function getTransactionReference()
     {
         return $this->reference;
     }
 
-    /**
-     * @return bool
-     * @codeCoverageIgnore
-     */
     public function isRedirect()
     {
-        return true;
+        return $this->isSuccessful();
     }
 
     public function getRedirectUrl()
     {
-        $data = json_decode($this->getResponseBody());
-        return $data->url;
+        $resource = $this->getResource();
+        return $resource->url ?? null;
     }
 
-    /**
-     * @return string
-     * @codeCoverageIgnore
-     */
     public function getRedirectMethod()
     {
         return 'GET';
     }
 
-    /**
-     * @return array
-     * @codeCoverageIgnore
-     */
     public function getRedirectData()
     {
         return [];

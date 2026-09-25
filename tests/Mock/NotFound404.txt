@@ -1,0 +1,4 @@
+HTTP/1.1 404 Not Found
+Content-Type: application/json; charset=utf-8
+
+{"message":"Not found: No Subscription with id 1","errors":null,"error_code":null}

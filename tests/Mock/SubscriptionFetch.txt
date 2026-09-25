@@ -1,0 +1,4 @@
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+
+{"id":600002,"order_id":"S301","accepted":true,"type":"Subscription","state":"active","metadata":{"type":"card","brand":"visa","last4":"0008","exp_month":12,"exp_year":2029},"operations":[{"type":"authorize","pending":false,"qp_status_code":"20000","qp_status_msg":"Approved"}]}

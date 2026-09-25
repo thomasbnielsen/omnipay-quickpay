@@ -2,119 +2,106 @@
 
 namespace Omnipay\Quickpay\Message;
 
-use Omnipay\Common\Exception\InvalidRequestException;
 use Omnipay\Common\Exception\InvalidResponseException;
 use Omnipay\Tests\TestCase;
-use Symfony\Component\HttpFoundation\Request;
 
 class CompleteRequestTest extends TestCase
 {
-    /** @var  CompleteRequest */
+    /** @var CompleteRequest */
     protected $request;
-    /** @var  Request */
-    protected $mockRequest;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
-        $this->mockRequest = $this->getHttpRequest();
-        $this->request     = new CompleteRequest($this->getHttpClient(), $this->mockRequest);
+        $this->request = new CompleteRequest($this->getHttpClient(), $this->getHttpRequest());
     }
 
-    public function testGetData()
+    private function giveCallback(array $body, string $key = 'secret', ?string $checksum = null): string
     {
-        $this->request->initialize(
-            ['privateKey' => 1]
-        );
-        $data = $this->request->getData();
-        $this->assertTrue(is_array($data));
-        $this->assertTrue(count($data) === 0);
+        $content = json_encode($body);
+        $this->getHttpRequest()->initialize([], [], [], [], [], [
+            'CONTENT_TYPE' => 'application/json; charset=utf-8',
+            'HTTP_QUICKPAY_CHECKSUM_SHA256' => $checksum ?? hash_hmac('sha256', $content, $key),
+        ], $content);
+        return $content;
     }
 
-    public function testGetDataWithContentTypeJson()
+    public function testBrowserReturnHasNoResult()
     {
-        $this->mockRequest->initialize(
-            ['test' => 1],
-            [],
-            [],
-            [],
-            [],
-            [
-                'HTTP_CONTENT_TYPE'             => 'application/json',
-                'HTTP_QUICKPAY_CHECKSUM_SHA256' => '83ce13bda6523334daa14f33d1fc2adc98ff8b57c4df5be5d2f58b1c2c78fa1e'
-            ],
-            '[]'
-        );
+        $this->getHttpRequest()->initialize(['foo' => 'bar']);
+        $this->request->initialize(['privatekey' => 'secret']);
+        $this->assertSame(['foo' => 'bar'], $this->request->getData());
 
-        $data = $this->request->getData();
-
-        $this->assertEquals('[]', $data);
+        $response = $this->request->send();
+        $this->assertFalse($response->isSuccessful());
+        $this->assertSame([], $this->getMockClient()->getRequests(), 'no API call on completion');
     }
 
-    public function testGetDataWithContentTypeJsonWithInvalidSha()
+    public function testApprovedPaymentCallbackIsSuccessfulWithoutApiCall()
     {
-        $this->mockRequest->initialize(
-            ['test' => 1],
-            [],
-            [],
-            [],
-            [],
-            [
-                'HTTP_CONTENT_TYPE'             => 'application/json',
-                'HTTP_QUICKPAY_CHECKSUM_SHA256' => '83ce13dffa6523334daa14f33d1fc2adc98ff8b57c4df5be5d2f58b1c2c78fa1e'
-            ],
-            '[]'
-        );
+        $content = $this->giveCallback([
+            'id' => 123456, 'order_id' => 'T100', 'accepted' => true, 'type' => 'Payment',
+            'operations' => [['type' => 'authorize', 'pending' => false, 'qp_status_code' => '20000', 'qp_status_msg' => 'Approved']],
+        ]);
+        $this->request->initialize(['privatekey' => 'secret']);
 
-        try {
-            $this->request->getData();
-            $this->fail('Expected an exception');
-        } catch (InvalidResponseException $e) {
-            $this->assertEquals('Invalid response from payment gateway', $e->getMessage());
-        }
+        $response = $this->request->send();
 
+        $this->assertSame($content, $response->getData());
+        $this->assertTrue($response->isSuccessful());
+        $this->assertSame('123456', $response->getTransactionReference());
+        $this->assertSame('T100', $response->getTransactionId());
+        $this->assertSame([], $this->getMockClient()->getRequests());
     }
 
-
-    public function testGetUrl()
+    public function testSubscriptionAuthorisationCallback()
     {
-        $this->request->initialize(
-            ['apikey' => 1, 'transactionId' => '10', 'agreement' => 2, 'amount' => 10.00, 'currency' => 'DKK']
-        );
-        $url = $this->request->getUrl();
-        $this->assertNotContains('?synchronized', $url);
+        $this->giveCallback([
+            'id' => 618586255, 'order_id' => 'S1', 'accepted' => true, 'type' => 'Subscription', 'state' => 'active',
+            'metadata' => ['brand' => 'visa', 'last4' => '0008', 'exp_month' => 12, 'exp_year' => 2029],
+            'operations' => [['type' => 'authorize', 'pending' => false, 'qp_status_code' => '20000', 'qp_status_msg' => 'Approved']],
+        ]);
+        $this->request->initialize(['privatekey' => 'secret']);
 
-        foreach (['', 0, false, null] as $untruthyValue) {
-            $this->request->initialize(
-                [
-                    'apikey'        => 1,
-                    'transactionId' => '10',
-                    'agreement'     => 2,
-                    'amount'        => 10.00,
-                    'currency'      => 'DKK',
-                    'synchronized'  => $untruthyValue
-                ]
-            );
-            $url = $this->request->getUrl();
-            $this->assertNotContains('?synchronized', $url);
-        }
+        $response = $this->request->send();
 
-        foreach (['1', 1, true, "synchronized"] as $truthyValue) {
-            $this->request->initialize(
-                [
-                    'apikey'        => 1,
-                    'transactionId' => '10',
-                    'agreement'     => 2,
-                    'amount'        => 10.00,
-                    'currency'      => 'DKK',
-                    'synchronized'  => $truthyValue
-                ]
-            );
-            $url = $this->request->getUrl();
-            $this->assertContains('?synchronized', $url);
-        }
-
-
+        $this->assertTrue($response->isSuccessful());
+        $this->assertSame('618586255', $response->getTransactionReference());
+        $this->assertSame('Subscription', $response->getResourceType());
+        $this->assertSame('0008', $response->getCardLast4());
+        $this->assertSame('12/2029', $response->getCardExpiry());
     }
 
+    public function testRejectedCallbackIsNotSuccessful()
+    {
+        $this->giveCallback([
+            'id' => 1, 'accepted' => false,
+            'operations' => [['type' => 'authorize', 'pending' => false, 'qp_status_code' => '30101', 'qp_status_msg' => 'SCA required on cards from EEA']],
+        ]);
+        $this->request->initialize(['privatekey' => 'secret']);
+
+        $response = $this->request->send();
+
+        $this->assertFalse($response->isSuccessful());
+        $this->assertSame('30101', $response->getCode());
+        $this->assertSame('authorize: SCA required on cards from EEA', $response->getMessage());
+    }
+
+    public function testWrongChecksumIsRejected()
+    {
+        $this->giveCallback(['id' => 1], 'secret', str_repeat('0', 64));
+        $this->request->initialize(['privatekey' => 'secret']);
+
+        $this->expectException(InvalidResponseException::class);
+        $this->request->getData();
+    }
+
+    public function testMissingPrivateKeyIsRejected()
+    {
+        $this->giveCallback(['id' => 1], '');
+        $this->request->initialize([]);
+
+        $this->expectException(InvalidResponseException::class);
+        $this->request->getData();
+    }
 }

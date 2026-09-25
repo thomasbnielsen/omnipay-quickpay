@@ -8,7 +8,7 @@ class GatewayTest extends GatewayTestCase
     /** @var  Gateway */
     protected $gateway;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->gateway = new Gateway($this->getHttpClient(), $this->getHttpRequest());
@@ -23,7 +23,7 @@ class GatewayTest extends GatewayTestCase
 
     public function testCapture()
     {
-        $request = $this->gateway->capture(array('amount' => '10.00'));
+        $request = $this->gateway->capture(array('amount' => '10.00', 'transactionReference' => '1'));
         $this->assertInstanceOf('Omnipay\Quickpay\Message\CaptureRequest', $request);
         $this->assertSame('10.00', $request->getAmount());
         $this->assertTrue(count($request->getData()) > 0);
@@ -101,6 +101,24 @@ class GatewayTest extends GatewayTestCase
     {
         $request = $this->gateway->completeRecurring(['amount' => 10.00]);
         $this->assertInstanceOf('Omnipay\Quickpay\Message\CompleteRequest', $request);
+    }
+
+    public function testFetchTransaction()
+    {
+        $request = $this->gateway->fetchTransaction(['transactionReference' => '1']);
+        $this->assertInstanceOf('Omnipay\Quickpay\Message\FetchTransactionRequest', $request);
+        $this->assertInstanceOf('Omnipay\Quickpay\Message\FetchTransactionRequest', $this->gateway->status(['transactionReference' => '1']));
+    }
+
+    public function testDeleteIsRemoved()
+    {
+        $this->assertFalse(method_exists($this->gateway, 'delete'));
+    }
+
+    public function testUnknownMethodFailsLoudly()
+    {
+        $this->expectException(\Error::class);
+        $this->gateway->doesNotExist();
     }
 
     public function testAcceptNotification()

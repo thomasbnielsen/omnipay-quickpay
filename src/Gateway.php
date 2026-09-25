@@ -6,10 +6,12 @@ use Omnipay\Common\AbstractGateway;
 use Omnipay\Quickpay\Message\Notification;
 
 /**
- * Quickpay Gateway
- * @method \Omnipay\Common\Message\RequestInterface createCard(array $options = array())
- * @method \Omnipay\Common\Message\RequestInterface updateCard(array $options = array())
- * @method \Omnipay\Common\Message\RequestInterface deleteCard(array $options = array())
+ * Quickpay (API v10) gateway.
+ *
+ * Payments: purchase / authorize (hosted payment window), completePurchase /
+ * completeAuthorize and acceptNotification (callbacks), capture, refund, void.
+ * Subscriptions (saved cards), with type=subscription: link, recurring, void (cancel).
+ * Both: fetchTransaction.
  */
 class Gateway extends AbstractGateway
 {
@@ -39,8 +41,8 @@ class Gateway extends AbstractGateway
 			'order_id'                     => '',
 			'synchronized'                 => false,
 			'payment_methods'              => array(),
-			'auto_capture'				   => false,
-			'variables'					   => array(),
+			'auto_capture'                 => null,
+			'variables'                    => array(),
 		);
 	}
 
@@ -245,7 +247,7 @@ class Gateway extends AbstractGateway
 	 */
 	public function getSynchronized()
 	{
-		return boolval($this->getParameter('synchronized'));
+		return $this->getParameter('synchronized');
 	}
 
 
@@ -263,7 +265,7 @@ class Gateway extends AbstractGateway
 	 */
 	public function getAutoCapture()
 	{
-		return boolval($this->getParameter('auto_capture'));
+		return $this->getParameter('auto_capture');
 	}
 	
 	/**
@@ -426,17 +428,24 @@ class Gateway extends AbstractGateway
 	}
 
 	/**
+	 * Look up a payment, or a subscription with type=subscription.
+	 *
 	 * @param array $parameters
-	 * @return \Omnipay\Quickpay\Message\DeleteRequest
+	 * @return \Omnipay\Quickpay\Message\FetchTransactionRequest
 	 */
-	public function delete(array $parameters = array())
+	public function fetchTransaction(array $parameters = array())
 	{
-		return $this->createRequest('\Omnipay\Quickpay\Message\DeleteRequest', $parameters);
+		return $this->createRequest('\Omnipay\Quickpay\Message\FetchTransactionRequest', $parameters);
 	}
 
+	/**
+	 * @deprecated 5.0 Use fetchTransaction()
+	 * @param array $parameters
+	 * @return \Omnipay\Quickpay\Message\FetchTransactionRequest
+	 */
 	public function status(array $parameters = array())
 	{
-		return $this->createRequest('\Omnipay\Quickpay\Message\StatusRequest', $parameters);
+		return $this->fetchTransaction($parameters);
 	}
 
 	/**
@@ -456,10 +465,4 @@ class Gateway extends AbstractGateway
 		return $this->setParameter('variables', $value);
 	}
 
-	function __call($name, $arguments)
-	{
-		// TODO: Implement @method \Omnipay\Common\Message\RequestInterface createCard(array $options = array())
-		// TODO: Implement @method \Omnipay\Common\Message\RequestInterface updateCard(array $options = array())
-		// TODO: Implement @method \Omnipay\Common\Message\RequestInterface deleteCard(array $options = array())
-	}
 }

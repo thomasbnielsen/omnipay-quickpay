@@ -1,34 +1,23 @@
 <?php
 
-
 namespace Omnipay\Quickpay\Message;
 
 /**
- * quickpay Refund Request
+ * POST /payments/{id}/refund[?synchronized]  body: {amount}
  */
 class RefundRequest extends AbstractRequest
 {
+    protected $responseClass = RefundResponse::class;
 
-    public function send()
+    public function __construct($httpClient, $httpRequest)
     {
-        $reference = $this->getTransactionReference();
-
-        $url  = $this->getEndPoint() . $this->getTypeOfRequest() . '/' .$reference . '/refund';
-
-        $requestParams = [
-			'Authorization' => 'Basic ' . base64_encode(":" . $this->getApikey()),
-			'Accept-Version' => 'v10',
-			'Content-Type' => 'application/json',
-			'QuickPay-Callback-Url' => $this->getNotifyUrl(),
-			'id' => $reference,
-			'amount' => $this->getAmountInteger()
-		];
-
-         $httpResponse = $this->httpClient->request('POST', $url, $requestParams, json_encode(['id' => $reference, 'amount' => $this->getAmountInteger()]));
-
-        $body = $httpResponse->getBody()->getContents();
-
-        return new RefundResponse($this, $body, $reference);
+        parent::__construct($httpClient, $httpRequest);
+        $this->setApiMethod('refund');
     }
 
+    public function getData()
+    {
+        $this->validate('transactionReference', 'amount');
+        return parent::getData();
+    }
 }

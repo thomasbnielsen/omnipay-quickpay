@@ -2,28 +2,39 @@
 
 namespace Omnipay\Quickpay\Message;
 
-
-use Omnipay\Common\Exception\InvalidResponseException;
 use Omnipay\Common\Message\NotificationInterface;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Incoming Quickpay callback (acceptNotification). Used by silverstripe-omnipay for
+ * capture, refund and void callbacks.
+ */
 class Notification implements NotificationInterface
 {
+    use QuickpayResourceTrait;
 
     /**
-     * The HTTP request object.
-     *
-     * @var \Symfony\Component\HttpFoundation\Request
+     * @var Request
      */
     protected $httpRequest;
 
     protected $privateKey;
 
-    protected $data;
+    /**
+     * @var object|null|false false = not read yet
+     */
+    protected $data = false;
+
+    public function __construct(Request $request, $privateKey = null)
+    {
+        $this->httpRequest = $request;
+        $this->privateKey = $privateKey;
+    }
 
     public function setPrivateKey($value)
     {
         $this->privateKey = $value;
+        $this->data = false;
         return $this;
     }
 
@@ -32,93 +43,73 @@ class Notification implements NotificationInterface
         return $this->privateKey;
     }
 
-    public function __construct(Request $request, $privateKey = null)
-    {
-        $this->httpRequest = $request;
-        $this->privateKey = $privateKey;
-    }
-
+    /**
+     * Decoded callback body, or null when the request is not a callback.
+     *
+     * @throws \Omnipay\Common\Exception\InvalidResponseException on a bad checksum or missing key
+     * @return object|null
+     */
     public function getData()
     {
-        if ($this->data){
-            return $this->data;
-        }
-
-        if ($this->httpRequest->headers->get('Content-Type') == "application/json") {
-            $data = json_decode($this->httpRequest->getContent());
-
-            $headerChecksum = $this->httpRequest->headers->get('Quickpay-Checksum-Sha256');
-            // validate with accounts private key.
-            $checksum = hash_hmac("sha256", $this->httpRequest->getContent(), $this->getPrivateKey());
-            if ($checksum != $headerChecksum) {
-                throw new InvalidResponseException("Checksum mismatch checksum:$checksum != header:$headerChecksum");
+        if ($this->data === false) {
+            $this->data = null;
+            if (CallbackVerifier::isCallback($this->httpRequest)) {
+                $decoded = json_decode(CallbackVerifier::verify($this->httpRequest, $this->getPrivateKey()));
+                $this->data = is_object($decoded) ? $decoded : null;
             }
-
-            $this->data = $data;
         }
-
         return $this->data;
     }
 
     /**
-     * Gateway Reference
-     *
-     * @return string A reference provided by the gateway to represent this transaction
+     * @return object|null
      */
-    public function getTransactionReference()
+    public function getResource()
     {
-        if ($data = $this->getData()) {
-            // Quickpay returns id as a JSON number — cast to string, same
-            // fix as Response::getTransactionReference() and LinkRequest.
-            return (string) $data->id;
-        }
+        return $this->getData();
     }
 
     /**
-     * Was the transaction successful?
-     *
-     * @return string Transaction status, one of {@see STATUS_COMPLETED}, {@see #STATUS_PENDING},
-     * or {@see #STATUS_FAILED}.
+     * @return string|null
+     */
+    public function getTransactionReference()
+    {
+        $data = $this->getData();
+        return isset($data->id) ? (string) $data->id : null;
+    }
+
+    /**
+     * @return string|null Quickpay order_id
+     */
+    public function getTransactionId()
+    {
+        return $this->getOrderId();
+    }
+
+    /**
+     * @return string one of STATUS_COMPLETED, STATUS_PENDING, STATUS_FAILED
      */
     public function getTransactionStatus()
     {
-        if ($data = $this->getData()){
-            if ($op = $this->getLatestOperation()) {
-				if ($op->pending == false && $op->qp_status_code == "20000") {
-					return NotificationInterface::STATUS_COMPLETED;
-				} else if ($op->pending) {
-					return NotificationInterface::STATUS_PENDING;
-				}
-			}
+        if (!$this->getData()) {
+            return NotificationInterface::STATUS_FAILED;
         }
-
+        $operation = $this->getLatestOperation();
+        if (!$operation || !empty($operation->pending)) {
+            return NotificationInterface::STATUS_PENDING;
+        }
+        if (isset($operation->qp_status_code) && (string) $operation->qp_status_code === '20000') {
+            return NotificationInterface::STATUS_COMPLETED;
+        }
         return NotificationInterface::STATUS_FAILED;
     }
 
     /**
-     * Response Message
-     *
-     * @return string A response message from the payment gateway
+     * @return string
      */
     public function getMessage()
     {
-        if ($data = $this->getData()){
-            if ($op = $this->getLatestOperation()) {
-				return $op->qp_status_msg;
-			}
-        }
-        return '';
+        $operation = $this->getData() ? $this->getLatestOperation() : null;
+        return ($operation && isset($operation->qp_status_msg)) ? (string) $operation->qp_status_msg : '';
     }
-
-	/**
-	 * Get latest operation
-	 *
-	 * @return bool|mixed
-	 */
-    public function getLatestOperation() {
-		if ($data = $this->getData()) {
-			return end($data->operations);
-		}
-		return false;
-	}
 }

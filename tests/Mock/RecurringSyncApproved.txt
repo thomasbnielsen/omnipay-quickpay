@@ -1,0 +1,4 @@
+HTTP/1.1 202 Accepted
+Content-Type: application/json; charset=utf-8
+
+{"id":700001,"order_id":"R100-1","accepted":true,"type":"Payment","state":"processed","currency":"DKK","metadata":{"type":"card","brand":"visa","last4":"0008","exp_month":12,"exp_year":2029},"operations":[{"id":1,"type":"recurring","amount":25000,"pending":false,"qp_status_code":"20000","qp_status_msg":"Approved"},{"id":2,"type":"capture","amount":25000,"pending":false,"qp_status_code":"20000","qp_status_msg":"Approved"}]}

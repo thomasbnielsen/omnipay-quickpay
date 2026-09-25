@@ -417,9 +417,19 @@ class Gateway extends AbstractGateway
 	/**
 	 * @return Notification
 	 */
+	/**
+	 * Verifies the callback straight away, so a forged or unverifiable callback surfaces as an
+	 * InvalidResponseException from this call (which silverstripe-omnipay turns into a logged
+	 * NotificationError) instead of later, when the result is read.
+	 *
+	 * @return Notification
+	 * @throws \Omnipay\Common\Exception\InvalidResponseException
+	 */
 	public function acceptNotification()
 	{
-		return new Notification($this->httpRequest, $this->getPrivatekey());
+		$notification = new Notification($this->httpRequest, $this->getPrivatekey());
+		$notification->getData();
+		return $notification;
 	}
 
 	public function link(array $parameters = array())

@@ -121,6 +121,18 @@ class GatewayTest extends GatewayTestCase
         $this->gateway->doesNotExist();
     }
 
+    public function testAcceptNotificationVerifiesImmediately()
+    {
+        $this->getHttpRequest()->initialize([], [], [], [], [], [
+            'CONTENT_TYPE' => 'application/json',
+            'HTTP_QUICKPAY_CHECKSUM_SHA256' => 'forged',
+        ], '{"id":1}');
+        $this->gateway->setPrivatekey('secret');
+
+        $this->expectException(\Omnipay\Common\Exception\InvalidResponseException::class);
+        $this->gateway->acceptNotification();
+    }
+
     public function testAcceptNotification()
     {
         $notification = $this->gateway->acceptNotification();
